@@ -1,0 +1,1383 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>快递管理 · 交互原型</title>
+  <style>
+    :root {
+      --brand: #2357d9;
+      --brand-2: #4b78ee;
+      --brand-soft: #eef3ff;
+      --text: #182033;
+      --muted: #6d778c;
+      --line: #e9edf4;
+      --page: #f5f7fb;
+      --panel: #ffffff;
+      --success: #19a66a;
+      --warning: #e99922;
+      --danger: #e24a4a;
+      --shadow: 0 14px 44px rgba(28, 45, 90, .12);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--page);
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 232px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: 232px;
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+      background:
+        radial-gradient(circle at 0 0, rgba(77, 123, 255, .38), transparent 36%),
+        #101a35;
+      z-index: 10;
+    }
+    .brand {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: linear-gradient(145deg, #5c89ff, #2455dc);
+      box-shadow: 0 8px 20px rgba(42, 89, 223, .45);
+    }
+    .brand-title { font-size: 18px; font-weight: 700; letter-spacing: .5px; }
+    .brand-sub { margin-top: 2px; color: rgba(255,255,255,.48); font-size: 11px; }
+
+    .nav-label {
+      padding: 24px 24px 10px;
+      color: rgba(255,255,255,.36);
+      font-size: 11px;
+      letter-spacing: 1.4px;
+    }
+    .nav { padding: 0 12px; }
+    .nav-item {
+      width: 100%;
+      height: 48px;
+      margin-bottom: 6px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255,255,255,.66);
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      text-align: left;
+      transition: .18s ease;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.06); }
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(90deg, rgba(74, 119, 239, .98), rgba(55, 94, 207, .76));
+      box-shadow: 0 8px 24px rgba(18, 56, 158, .34);
+    }
+    .nav-icon {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: rgba(255,255,255,.08);
+      font-size: 12px;
+    }
+    .nav-item.active .nav-icon { background: rgba(255,255,255,.18); }
+    .sidebar-foot {
+      margin-top: auto;
+      padding: 18px 16px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+    }
+    .avatar {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #f2b84b;
+      color: #614314;
+      font-weight: 700;
+    }
+    .user-name { font-size: 13px; }
+    .user-role { margin-top: 3px; color: rgba(255,255,255,.42); font-size: 11px; }
+
+    .main {
+      grid-column: 2;
+      min-width: 0;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      height: 72px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .crumb { color: var(--muted); font-size: 13px; }
+    .crumb strong { margin-left: 8px; color: var(--text); font-weight: 600; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      color: #63708a;
+    }
+    .help {
+      padding: 7px 11px;
+      color: #60708e;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      font-size: 12px;
+    }
+
+    .content { padding: 28px 32px 42px; }
+    .page { display: none; animation: enter .22s ease both; }
+    .page.active { display: block; }
+    @keyframes enter { from { opacity: 0; transform: translateY(5px); } }
+
+    .page-head {
+      margin-bottom: 22px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    h1 { margin: 0; font-size: 24px; letter-spacing: -.4px; }
+    .page-desc { margin: 8px 0 0; color: var(--muted); line-height: 1.6; }
+    .btn {
+      height: 38px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: #34405a;
+      transition: .16s ease;
+    }
+    .btn:hover { border-color: #c8d2e6; background: #fafbfe; }
+    .btn-primary {
+      color: #fff;
+      border-color: var(--brand);
+      background: var(--brand);
+      box-shadow: 0 7px 16px rgba(35, 87, 217, .18);
+    }
+    .btn-primary:hover { border-color: #1e4ec4; background: #1e4ec4; }
+    .btn-danger { color: var(--danger); }
+    .btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+
+    .metrics {
+      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(160px, 1fr));
+      gap: 14px;
+    }
+    .metric {
+      padding: 17px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+    }
+    .metric-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-size: 18px;
+    }
+    .metric-value { font-size: 21px; font-weight: 700; }
+    .metric-label { margin-top: 3px; color: var(--muted); font-size: 12px; }
+
+    .panel {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      box-shadow: 0 3px 12px rgba(33, 48, 85, .03);
+    }
+    .toolbar {
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .search {
+      width: 230px;
+      height: 36px;
+      padding: 0 12px 0 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      background:
+        linear-gradient(45deg, transparent 45%, #8994a9 46%, #8994a9 54%, transparent 55%) 18px 22px / 6px 6px no-repeat,
+        radial-gradient(circle, transparent 43%, #8994a9 45%, #8994a9 55%, transparent 57%) 12px 10px / 12px 12px no-repeat;
+    }
+    .search:focus, .select:focus, .field input:focus, .field select:focus {
+      border-color: #86a4f5;
+      box-shadow: 0 0 0 3px rgba(35, 87, 217, .08);
+    }
+    .select {
+      height: 36px;
+      padding: 0 28px 0 11px;
+      color: #536078;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      background: #fff;
+    }
+    .toolbar-note { color: var(--muted); font-size: 12px; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+    th {
+      padding: 13px 15px;
+      color: #6a7489;
+      background: #fafbfc;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    td {
+      padding: 16px 15px;
+      border-bottom: 1px solid #f0f2f7;
+      vertical-align: middle;
+    }
+    tbody tr:hover { background: #fbfcff; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .company { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+    .company-logo {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .blue { background: #2d63df; }
+    .orange { background: #ef8e2f; }
+    .red { background: #df4747; }
+    .green { background: #22a676; }
+    .purple { background: #795bd4; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    .tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+    .tag-on { color: #16875a; background: #eaf8f2; }
+    .tag-on::before { background: #22ab73; }
+    .tag-off { color: #8a92a2; background: #f1f3f6; }
+    .tag-off::before { background: #9ca4b2; }
+    .tag-warn { color: #b87515; background: #fff5e5; }
+    .tag-warn::before { background: #e9a337; }
+    .link {
+      padding: 0;
+      color: var(--brand);
+      border: 0;
+      background: transparent;
+    }
+    .link + .link { margin-left: 13px; }
+    .link.danger { color: var(--danger); }
+    .muted { color: var(--muted); }
+    .price { font-weight: 700; color: #283653; }
+    .pagination {
+      padding: 15px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+      border-top: 1px solid var(--line);
+    }
+    .page-btn {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: #657089;
+    }
+    .page-btn.active { color: #fff; border-color: var(--brand); background: var(--brand); }
+
+    .coverage {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .coverage span {
+      padding: 4px 8px;
+      color: #4d6389;
+      border-radius: 6px;
+      background: #f0f4fb;
+      font-size: 12px;
+    }
+    .rule-cell { line-height: 1.65; }
+    .rule-cell b { color: #26344f; }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      background: rgba(16, 24, 44, .38);
+      backdrop-filter: blur(2px);
+    }
+    .overlay.show { display: block; }
+    .drawer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(560px, 94vw);
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      box-shadow: var(--shadow);
+      animation: slide .22s ease both;
+    }
+    @keyframes slide { from { transform: translateX(32px); opacity: 0; } }
+    .drawer-head {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+    .drawer-title { font-size: 18px; font-weight: 700; }
+    .close {
+      width: 32px;
+      height: 32px;
+      color: #6b7589;
+      border: 0;
+      border-radius: 8px;
+      background: #f4f6fa;
+      font-size: 20px;
+    }
+    .drawer-body { padding: 24px; overflow: auto; }
+    .form-section { margin-bottom: 25px; }
+    .section-title {
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+    .section-title::before {
+      content: "";
+      width: 3px;
+      height: 15px;
+      border-radius: 2px;
+      background: var(--brand);
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { display: block; margin-bottom: 7px; color: #4e5a70; font-size: 13px; }
+    .required::before { content: "*"; margin-right: 3px; color: var(--danger); }
+    .field input, .field select {
+      width: 100%;
+      height: 39px;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      background: #fff;
+    }
+    .field-help { margin-top: 6px; color: #9199a9; font-size: 11px; line-height: 1.5; }
+    .region-trigger {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #8a93a5;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      text-align: left;
+    }
+    .region-trigger.has-value { color: #35415a; }
+    .region-panel {
+      display: none;
+      margin-top: 9px;
+      overflow: hidden;
+      border: 1px solid #dfe5f0;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 10px 28px rgba(30, 48, 91, .08);
+    }
+    .region-panel.show { display: block; }
+    .region-panel-head {
+      padding: 11px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+      background: #fafbfe;
+    }
+    .region-panel-head input[type="search"] {
+      flex: 1;
+      min-width: 0;
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      outline: none;
+      background: #fff;
+    }
+    .check-label {
+      display: inline-flex !important;
+      align-items: center;
+      gap: 6px;
+      margin: 0 !important;
+      color: #46536c !important;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .check-label input { width: 15px; height: 15px; accent-color: var(--brand); }
+    .region-tree {
+      max-height: 250px;
+      overflow: auto;
+      padding: 6px 12px;
+    }
+    .province-row { border-bottom: 1px solid #f0f2f6; }
+    .province-row:last-child { border-bottom: 0; }
+    .province-row.filtered-out { display: none; }
+    .province-head {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .province-toggle {
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      color: #71809b;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      transition: .16s ease;
+    }
+    .province-toggle:hover { background: #f0f4fb; }
+    .province-row.open .province-toggle { transform: rotate(90deg); }
+    .province-name { font-weight: 600; }
+    .province-progress { margin-left: 4px; color: #9aa2b2; font-size: 11px; font-weight: 400; }
+    .city-grid {
+      display: none;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px 10px;
+      padding: 3px 8px 12px 32px;
+    }
+    .province-row.open .city-grid { display: grid; }
+    .city-option {
+      min-width: 0;
+      padding: 4px 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 12px;
+    }
+    .city-option.filtered-out { display: none !important; }
+    .region-panel-foot {
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--line);
+      background: #fafbfe;
+    }
+    .selected-summary { color: #6f7a8f; font-size: 12px; }
+    .selected-summary b { color: var(--brand); }
+    .selected-tags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .selected-tags:empty { display: none; }
+    .selected-tag {
+      padding: 4px 8px;
+      color: #395baf;
+      border-radius: 6px;
+      background: var(--brand-soft);
+      font-size: 12px;
+    }
+    .radio-row { min-height: 39px; display: flex; align-items: center; gap: 20px; }
+    .radio { display: inline-flex; align-items: center; gap: 7px; color: #4e5a70; }
+    .radio input { width: auto; height: auto; accent-color: var(--brand); }
+    .rate-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fafbfe;
+    }
+    .rate-line {
+      display: grid;
+      grid-template-columns: 80px 1fr 34px 1fr 26px;
+      align-items: center;
+      gap: 8px;
+    }
+    .rate-line + .rate-line { margin-top: 10px; }
+    .rate-line input { height: 36px; }
+    .unit { color: var(--muted); font-size: 12px; }
+    .price-mode-content.hidden { display: none; }
+    .manual-price-fields {
+      margin-top: 12px;
+      padding-top: 2px;
+    }
+    .manual-price-tip {
+      margin-bottom: 10px;
+      color: #768197;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .tier-list {
+      margin-top: 12px;
+      display: grid;
+      gap: 9px;
+    }
+    .tier-item {
+      padding: 11px;
+      display: grid;
+      grid-template-columns: auto minmax(46px, .65fr) auto minmax(46px, .65fr) auto minmax(46px, .65fr) auto minmax(62px, .85fr) auto 26px;
+      align-items: center;
+      gap: 7px;
+      border: 1px dashed #ccd6ea;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .tier-item input {
+      width: 100%;
+      height: 34px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      outline: none;
+    }
+    .tier-index {
+      color: #425272;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .remove-tier {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      color: var(--danger);
+      border: 0;
+      border-radius: 6px;
+      background: #fff1f1;
+    }
+    .add-tier {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .drawer-foot {
+      margin-top: auto;
+      padding: 15px 24px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+    .help-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(16, 24, 44, .45);
+      backdrop-filter: blur(3px);
+    }
+    .help-overlay.show { display: flex; }
+    .help-modal {
+      width: min(680px, 94vw);
+      max-height: min(720px, 90vh);
+      overflow: hidden;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 22px 70px rgba(17, 31, 67, .24);
+      animation: enter .2s ease both;
+    }
+    .help-modal-head {
+      padding: 20px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+    .help-modal-title { font-size: 18px; font-weight: 700; }
+    .help-modal-subtitle { margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .help-modal-body {
+      max-height: calc(min(720px, 90vh) - 132px);
+      padding: 22px;
+      overflow: auto;
+    }
+    .help-intro {
+      margin-bottom: 18px;
+      padding: 13px 15px;
+      color: #405270;
+      border: 1px solid #dfe7f8;
+      border-radius: 10px;
+      background: #f5f8ff;
+      line-height: 1.7;
+    }
+    .help-module-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .help-module {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .help-module-index {
+      width: 26px;
+      height: 26px;
+      margin-bottom: 10px;
+      display: grid;
+      place-items: center;
+      color: var(--brand);
+      border-radius: 8px;
+      background: var(--brand-soft);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .help-module-title { margin-bottom: 7px; font-weight: 700; }
+    .help-module-text { color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .help-rules {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+    .help-rules-title { margin-bottom: 10px; font-weight: 700; }
+    .help-rules ul { margin: 0; padding-left: 20px; color: #5e6b83; line-height: 1.9; }
+    .help-modal-foot {
+      padding: 14px 22px;
+      display: flex;
+      justify-content: flex-end;
+      border-top: 1px solid var(--line);
+    }
+    .toast {
+      position: fixed;
+      top: 88px;
+      left: 50%;
+      z-index: 80;
+      padding: 11px 18px;
+      color: #176e4d;
+      border: 1px solid #bce8d5;
+      border-radius: 8px;
+      background: #effbf6;
+      box-shadow: 0 8px 28px rgba(31, 79, 61, .12);
+      transform: translate(-50%, -16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .22s ease;
+    }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 76px minmax(0, 1fr); }
+      .sidebar { width: 76px; }
+      .brand { padding: 0 20px; }
+      .brand-copy, .nav-item span:last-child, .nav-label, .user-copy { display: none; }
+      .nav { padding: 16px 10px; }
+      .nav-item { justify-content: center; padding: 0; }
+      .main { grid-column: 2; }
+      .content { padding: 22px 20px 36px; }
+      .topbar { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">↗</div>
+        <div class="brand-copy">
+          <div class="brand-title">迅达运营台</div>
+          <div class="brand-sub">LOGISTICS CONSOLE</div>
+        </div>
+      </div>
+      <div class="nav-label">快递配置</div>
+      <nav class="nav">
+        <button class="nav-item active" data-page="base">
+          <span class="nav-icon">基</span><span>基础管理</span>
+        </button>
+        <button class="nav-item" data-page="region">
+          <span class="nav-icon">区</span><span>可送达区域管理</span>
+        </button>
+        <button class="nav-item" data-page="business">
+          <span class="nav-icon">价</span><span>业务线单价配置</span>
+        </button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="user">
+          <div class="avatar">林</div>
+          <div class="user-copy">
+            <div class="user-name">林晓 · 运营管理员</div>
+            <div class="user-role">华东运营中心</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="crumb">系统设置 <span>／</span><strong id="crumbTitle">基础管理</strong></div>
+        <div class="top-actions">
+          <button class="help" id="helpButton">原型说明</button>
+          <button class="icon-btn" title="消息">●</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="page active" id="page-base">
+          <div class="page-head">
+            <div>
+              <h1>基本快递信息配置</h1>
+              <p class="page-desc">维护快递公司基础档案，作为可送达区域、计价模板及业务线配置的统一基础数据来源。</p>
+            </div>
+            <button class="btn btn-primary open-drawer" data-form="base">＋ 新建快递公司</button>
+          </div>
+
+          <div class="metrics">
+            <div class="metric"><div class="metric-icon">运</div><div><div class="metric-value">5</div><div class="metric-label">快递公司总数</div></div></div>
+            <div class="metric"><div class="metric-icon">✓</div><div><div class="metric-value">4</div><div class="metric-label">当前已启用</div></div></div>
+            <div class="metric"><div class="metric-icon">更</div><div><div class="metric-value">06-24 10:36</div><div class="metric-label">最近更新时间</div></div></div>
+          </div>
+
+          <div class="panel">
+            <div class="toolbar">
+              <div class="filters">
+                <input class="search" placeholder="搜索快递公司名称/简称" />
+                <select class="select"><option>全部状态</option><option>启用</option><option>禁用</option></select>
+                <button class="btn btn-sm">查询</button>
+                <button class="btn btn-sm">重置</button>
+              </div>
+              <div class="toolbar-note">共 5 条数据</div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>序号</th><th>物流公司名称</th><th>英文简称</th><th>状态</th><th>创建时间</th><th>更新时间</th><th>创建人</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td>01</td><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>SF</td><td><span class="tag tag-on">启用</span></td><td>2026-03-12 09:25</td><td>2026-06-24 10:36</td><td>林晓</td><td><button class="link open-drawer" data-form="base-edit">修改</button><button class="link">禁用</button></td></tr>
+                  <tr><td>02</td><td><div class="company"><span class="company-logo orange">YTO</span>圆通速递</div></td><td>YTO</td><td><span class="tag tag-on">启用</span></td><td>2026-03-12 09:30</td><td>2026-06-20 15:18</td><td>林晓</td><td><button class="link open-drawer" data-form="base-edit">修改</button><button class="link">禁用</button></td></tr>
+                  <tr><td>03</td><td><div class="company"><span class="company-logo red">JD</span>京东物流</div></td><td>JD</td><td><span class="tag tag-on">启用</span></td><td>2026-03-12 09:38</td><td>2026-06-18 11:02</td><td>周明</td><td><button class="link open-drawer" data-form="base-edit">修改</button><button class="link">禁用</button></td></tr>
+                  <tr><td>04</td><td><div class="company"><span class="company-logo green">ZTO</span>中通快递</div></td><td>ZTO</td><td><span class="tag tag-on">启用</span></td><td>2026-03-12 09:42</td><td>2026-05-08 16:40</td><td>周明</td><td><button class="link open-drawer" data-form="base-edit">修改</button><button class="link">禁用</button></td></tr>
+                  <tr><td>05</td><td><div class="company"><span class="company-logo purple">STO</span>申通快递</div></td><td>STO</td><td><span class="tag tag-off">禁用</span></td><td>2026-04-02 14:15</td><td>2026-06-01 09:12</td><td>林晓</td><td><button class="link open-drawer" data-form="base-edit">修改</button><button class="link">启用</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination"><button class="page-btn">‹</button><button class="page-btn active">1</button><button class="page-btn">›</button></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-region">
+          <div class="page-head">
+            <div>
+              <h1>可送达区域管理</h1>
+              <p class="page-desc">配置运输区域、承诺时效与重量阶梯计价规则。</p>
+            </div>
+            <button class="btn btn-primary open-drawer" data-form="region">＋ 新建区域模板</button>
+          </div>
+          <div class="panel">
+            <div class="toolbar">
+              <div class="filters">
+                <input class="search" placeholder="搜索运输区域" />
+                <select class="select"><option>全部快递公司</option><option>顺丰速运</option><option>圆通速递</option></select>
+                <select class="select"><option>全部状态</option><option>启用</option><option>禁用</option></select>
+                <button class="btn btn-sm">查询</button>
+              </div>
+              <div class="toolbar-note">共 4 条区域模板</div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>模板名称</th><th>快递公司</th><th>运输区域</th><th>运输时效</th><th>基础计价模板</th><th>状态</th><th>更新时间</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td><b>江浙沪核心区</b></td><td>顺丰速运</td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span></div></td><td>次日达</td><td class="rule-cell">首重 <b>1kg / ¥12.00</b><br><span class="muted">续重每 1kg 加 ¥2.00</span></td><td><span class="tag tag-on">启用</span></td><td>2026-06-24 09:30</td><td><button class="link open-drawer" data-form="region-edit">修改</button><button class="link">禁用</button><button class="link danger">删除</button></td></tr>
+                  <tr><td><b>华东经济区</b></td><td>圆通速递</td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span><span>安徽</span></div></td><td>1-2 天</td><td class="rule-cell">首重 <b>1kg / ¥8.00</b><br><span class="muted">续重每 1kg 加 ¥1.50</span></td><td><span class="tag tag-on">启用</span></td><td>2026-06-22 14:18</td><td><button class="link open-drawer" data-form="region-edit">修改</button><button class="link">禁用</button><button class="link danger">删除</button></td></tr>
+                  <tr><td><b>全国标准区</b></td><td>京东物流</td><td><div class="coverage"><span>全国 28 省</span></div></td><td>2-3 天</td><td class="rule-cell">首重 <b>1kg / ¥10.00</b><br><span class="muted">续重 1-5kg 加 ¥3.00；5kg+ 加 ¥2.50</span></td><td><span class="tag tag-on">启用</span></td><td>2026-06-18 11:05</td><td><button class="link open-drawer" data-form="region-edit">修改</button><button class="link">禁用</button><button class="link danger">删除</button></td></tr>
+                  <tr><td><b>偏远地区模板</b></td><td>中通快递</td><td><div class="coverage"><span>新疆</span><span>西藏</span><span>青海</span></div></td><td>4-6 天</td><td class="rule-cell">首重 <b>1kg / ¥18.00</b><br><span class="muted">续重每 1kg 加 ¥8.00</span></td><td><span class="tag tag-off">禁用</span></td><td>2026-05-08 16:40</td><td><button class="link open-drawer" data-form="region-edit">修改</button><button class="link">启用</button><button class="link danger">删除</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-business">
+          <div class="page-head">
+            <div>
+              <h1>业务线单价配置</h1>
+              <p class="page-desc">将快递公司与业务线关联，并配置前后端展示及计价方式。</p>
+            </div>
+            <button class="btn btn-primary open-drawer" data-form="business">＋ 新增业务线配置</button>
+          </div>
+          <div class="panel">
+            <div class="toolbar">
+              <div class="filters">
+                <input class="search" placeholder="搜索快递公司/业务线" />
+                <select class="select"><option>全部业务线</option><option>商城订单</option><option>供应链调拨</option><option>售后寄回</option></select>
+                <select class="select"><option>全部状态</option><option>启用</option><option>禁用</option></select>
+                <button class="btn btn-sm">查询</button>
+              </div>
+              <div class="toolbar-note">共 5 条配置</div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>快递公司</th><th>调用业务线</th><th>前端展示</th><th>后端展示</th><th>快递价格</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>商城订单</td><td>顺丰标快 <span class="muted">#1</span></td><td>顺丰速运 <span class="muted">#10</span></td><td><span class="tag tag-warn">单独配置</span> <span class="price">¥13.50 起</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit">修改</button></td></tr>
+                  <tr><td><div class="company"><span class="company-logo red">JD</span>京东物流</div></td><td>商城订单</td><td>京东快递 <span class="muted">#2</span></td><td>京东物流 <span class="muted">#20</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">全国标准区</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit">修改</button></td></tr>
+                  <tr><td><div class="company"><span class="company-logo orange">YTO</span>圆通速递</div></td><td>供应链调拨</td><td>圆通物流 <span class="muted">#3</span></td><td>圆通速递 <span class="muted">#30</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">华东经济区</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit">修改</button></td></tr>
+                  <tr><td><div class="company"><span class="company-logo green">ZTO</span>中通快递</div></td><td>售后寄回</td><td>中通快递 <span class="muted">#4</span></td><td>中通快递 <span class="muted">#40</span></td><td><span class="tag tag-warn">单独配置</span> <span class="price">¥7.00 起</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit">修改</button></td></tr>
+                  <tr><td><div class="company"><span class="company-logo purple">STO</span>申通快递</div></td><td>商城订单</td><td>申通快递 <span class="muted">#5</span></td><td>申通快递 <span class="muted">#50</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">华东经济区</span></td><td><span class="tag tag-off">禁用</span></td><td><button class="link open-drawer" data-form="business-edit">修改</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <aside class="drawer">
+      <div class="drawer-head">
+        <div class="drawer-title" id="drawerTitle">新建快递公司</div>
+        <button class="close" id="closeDrawer">×</button>
+      </div>
+      <div class="drawer-body" id="drawerBody"></div>
+      <div class="drawer-foot">
+        <button class="btn" id="cancelDrawer">取消</button>
+        <button class="btn btn-primary" id="saveDrawer">保存配置</button>
+      </div>
+    </aside>
+  </div>
+  <div class="help-overlay" id="helpOverlay">
+    <section class="help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="help-modal-head">
+        <div>
+          <div class="help-modal-title" id="helpTitle">快递管理原型说明</div>
+          <div class="help-modal-subtitle">用于确认信息架构、配置规则与关键交互</div>
+        </div>
+        <button class="close" id="closeHelp" aria-label="关闭原型说明">×</button>
+      </div>
+      <div class="help-modal-body">
+        <div class="help-intro">
+          本原型围绕“基础数据 → 可送达区域与计价模板 → 业务线价格应用”搭建。基础快递信息是其他配置的统一数据来源。
+        </div>
+        <div class="help-module-list">
+          <div class="help-module">
+            <div class="help-module-index">01</div>
+            <div class="help-module-title">基本快递信息配置</div>
+            <div class="help-module-text">维护快递公司名称、英文简称、排序与启停状态。</div>
+          </div>
+          <div class="help-module">
+            <div class="help-module-index">02</div>
+            <div class="help-module-title">可送达区域管理</div>
+            <div class="help-module-text">选择全国省市范围，配置运输时效、首续重及阶梯报价。</div>
+          </div>
+          <div class="help-module">
+            <div class="help-module-index">03</div>
+            <div class="help-module-title">业务线单价配置</div>
+            <div class="help-module-text">关联业务线，可继承区域模板价格或单独维护计价规则。</div>
+          </div>
+        </div>
+        <div class="help-rules">
+          <div class="help-rules-title">关键规则</div>
+          <ul>
+            <li>同一快递公司的可送达区域不可重复覆盖。</li>
+            <li>模板价格随区域计价模板更新；单独配置仅对当前业务线生效。</li>
+            <li>禁用快递公司后，不再用于新增区域和业务线配置。</li>
+            <li>当前为交互原型，示例数据不会持久化到服务器。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal-foot">
+        <button class="btn btn-primary" id="confirmHelp">我知道了</button>
+      </div>
+    </section>
+  </div>
+  <div class="toast" id="toast">保存成功，配置已更新</div>
+
+  <template id="form-base">
+    <div class="form-section">
+      <div class="section-title">基础信息</div>
+      <div class="form-grid">
+        <div class="field full"><label class="required">物流公司名称</label><input value="" placeholder="请输入物流公司全称" /></div>
+        <div class="field"><label class="required">英文简称</label><input placeholder="例如：SF" /></div>
+        <div class="field"><label class="required">排序序号</label><input type="number" value="10" /></div>
+        <div class="field full"><label class="required">状态</label><div class="radio-row"><label class="radio"><input type="radio" name="s1" checked /> 启用</label><label class="radio"><input type="radio" name="s1" /> 禁用</label></div></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="section-title">配置提示</div>
+      <div class="rate-card muted">新建完成后，可继续为该快递公司配置可送达区域及业务线价格。</div>
+    </div>
+  </template>
+
+  <template id="form-region">
+    <div class="form-section">
+      <div class="section-title">运输范围</div>
+      <div class="form-grid">
+        <div class="field full"><label class="required">模板名称</label><input placeholder="例如：江浙沪核心区" /></div>
+        <div class="field"><label class="required">快递公司</label><select><option>请选择</option><option>顺丰速运</option><option>圆通速递</option><option>京东物流</option></select></div>
+        <div class="field"><label class="required">运输时效</label><input placeholder="例如：1-2 天" /></div>
+        <div class="field full">
+          <label class="required">运输区域</label>
+          <div class="region-picker">
+            <button type="button" class="region-trigger"><span class="region-trigger-text">请选择省/市，支持多选</span><span>⌄</span></button>
+            <div class="region-panel">
+              <div class="region-panel-head">
+                <input type="search" class="region-search" placeholder="搜索省份或城市" />
+                <label class="check-label"><input type="checkbox" class="region-select-all" /> 全国</label>
+              </div>
+              <div class="region-tree"></div>
+              <div class="region-panel-foot">
+                <span class="selected-summary">已选择 <b>0</b> 个城市</span>
+                <button type="button" class="btn btn-primary btn-sm region-confirm">完成选择</button>
+              </div>
+            </div>
+            <div class="selected-tags"></div>
+          </div>
+          <div class="field-help">可按全国、省份或城市多选；同一快递公司的区域范围不可重叠。</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="section-title">基础计价模板</div>
+      <div class="rate-editor" data-editor="region">
+        <div class="rate-card">
+          <div class="rate-line"><span>首重</span><input value="1" aria-label="首重重量" /><span class="unit">kg</span><input value="12.00" aria-label="首重价格" /><span class="unit">元</span></div>
+          <div class="rate-line"><span>续重每</span><input value="1" aria-label="续重单位" /><span class="unit">kg</span><input value="2.00" aria-label="续重价格" /><span class="unit">元</span></div>
+          <div class="tier-list"></div>
+        </div>
+        <button type="button" class="link add-tier">＋ 增加阶梯报价</button>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="field"><label class="required">状态</label><div class="radio-row"><label class="radio"><input type="radio" name="s2" checked /> 启用</label><label class="radio"><input type="radio" name="s2" /> 禁用</label></div></div>
+    </div>
+  </template>
+
+  <template id="form-business">
+    <div class="form-section">
+      <div class="section-title">关联关系</div>
+      <div class="form-grid">
+        <div class="field"><label class="required">快递公司名称</label><select><option>请选择</option><option>顺丰速运</option><option>圆通速递</option><option>京东物流</option></select></div>
+        <div class="field"><label class="required">调用业务线</label><select><option>商城订单</option><option>供应链调拨</option><option>售后寄回</option></select></div>
+        <div class="field"><label class="required">前端显示名称</label><input placeholder="用户端看到的名称" /></div>
+        <div class="field"><label class="required">前端显示序号</label><input type="number" value="1" /></div>
+        <div class="field"><label class="required">后端显示名称</label><input placeholder="运营端看到的名称" /></div>
+        <div class="field"><label class="required">后端显示序号</label><input type="number" value="10" /></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="section-title">快递价格</div>
+      <div class="field full">
+        <div class="radio-row">
+          <label class="radio"><input type="radio" name="price" value="template" class="price-mode-radio" checked /> 模板价格</label>
+          <label class="radio"><input type="radio" name="price" value="manual" class="price-mode-radio" /> 单独配置</label>
+        </div>
+      </div>
+      <div class="field full price-mode-content template-price-fields" style="margin-top:12px">
+        <label class="required">计价模板</label>
+        <select><option>请选择区域计价模板</option><option>江浙沪核心区</option><option>全国标准区</option></select>
+      </div>
+      <div class="price-mode-content manual-price-fields hidden">
+        <div class="manual-price-tip">单独配置仅对当前业务线生效，不受区域计价模板价格变更影响。</div>
+        <div class="rate-editor" data-editor="business">
+          <div class="rate-card">
+            <div class="rate-line"><span>首重</span><input value="1" aria-label="业务线首重重量" /><span class="unit">kg</span><input value="13.50" aria-label="业务线首重价格" /><span class="unit">元</span></div>
+            <div class="rate-line"><span>续重每</span><input value="1" aria-label="业务线续重单位" /><span class="unit">kg</span><input value="2.50" aria-label="业务线续重价格" /><span class="unit">元</span></div>
+            <div class="tier-list"></div>
+          </div>
+          <button type="button" class="link add-tier">＋ 增加阶梯报价</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="field"><label class="required">状态</label><div class="radio-row"><label class="radio"><input type="radio" name="s3" checked /> 启用</label><label class="radio"><input type="radio" name="s3" /> 禁用</label></div></div>
+    </div>
+  </template>
+
+  <script>
+    const pages = {
+      base: { title: "基础管理" },
+      region: { title: "可送达区域管理" },
+      business: { title: "业务线单价配置" }
+    };
+
+    const chinaRegions = {
+      "北京市": ["北京市"],
+      "天津市": ["天津市"],
+      "上海市": ["上海市"],
+      "重庆市": ["重庆市"],
+      "河北省": ["石家庄市","唐山市","秦皇岛市","邯郸市","邢台市","保定市","张家口市","承德市","沧州市","廊坊市","衡水市"],
+      "山西省": ["太原市","大同市","阳泉市","长治市","晋城市","朔州市","晋中市","运城市","忻州市","临汾市","吕梁市"],
+      "辽宁省": ["沈阳市","大连市","鞍山市","抚顺市","本溪市","丹东市","锦州市","营口市","阜新市","辽阳市","盘锦市","铁岭市","朝阳市","葫芦岛市"],
+      "吉林省": ["长春市","吉林市","四平市","辽源市","通化市","白山市","松原市","白城市","延边朝鲜族自治州"],
+      "黑龙江省": ["哈尔滨市","齐齐哈尔市","鸡西市","鹤岗市","双鸭山市","大庆市","伊春市","佳木斯市","七台河市","牡丹江市","黑河市","绥化市","大兴安岭地区"],
+      "江苏省": ["南京市","无锡市","徐州市","常州市","苏州市","南通市","连云港市","淮安市","盐城市","扬州市","镇江市","泰州市","宿迁市"],
+      "浙江省": ["杭州市","宁波市","温州市","嘉兴市","湖州市","绍兴市","金华市","衢州市","舟山市","台州市","丽水市"],
+      "安徽省": ["合肥市","芜湖市","蚌埠市","淮南市","马鞍山市","淮北市","铜陵市","安庆市","黄山市","滁州市","阜阳市","宿州市","六安市","亳州市","池州市","宣城市"],
+      "福建省": ["福州市","厦门市","莆田市","三明市","泉州市","漳州市","南平市","龙岩市","宁德市"],
+      "江西省": ["南昌市","景德镇市","萍乡市","九江市","新余市","鹰潭市","赣州市","吉安市","宜春市","抚州市","上饶市"],
+      "山东省": ["济南市","青岛市","淄博市","枣庄市","东营市","烟台市","潍坊市","济宁市","泰安市","威海市","日照市","临沂市","德州市","聊城市","滨州市","菏泽市"],
+      "河南省": ["郑州市","开封市","洛阳市","平顶山市","安阳市","鹤壁市","新乡市","焦作市","濮阳市","许昌市","漯河市","三门峡市","南阳市","商丘市","信阳市","周口市","驻马店市","济源市"],
+      "湖北省": ["武汉市","黄石市","十堰市","宜昌市","襄阳市","鄂州市","荆门市","孝感市","荆州市","黄冈市","咸宁市","随州市","恩施土家族苗族自治州","仙桃市","潜江市","天门市","神农架林区"],
+      "湖南省": ["长沙市","株洲市","湘潭市","衡阳市","邵阳市","岳阳市","常德市","张家界市","益阳市","郴州市","永州市","怀化市","娄底市","湘西土家族苗族自治州"],
+      "广东省": ["广州市","韶关市","深圳市","珠海市","汕头市","佛山市","江门市","湛江市","茂名市","肇庆市","惠州市","梅州市","汕尾市","河源市","阳江市","清远市","东莞市","中山市","潮州市","揭阳市","云浮市"],
+      "海南省": ["海口市","三亚市","三沙市","儋州市","五指山市","琼海市","文昌市","万宁市","东方市"],
+      "四川省": ["成都市","自贡市","攀枝花市","泸州市","德阳市","绵阳市","广元市","遂宁市","内江市","乐山市","南充市","眉山市","宜宾市","广安市","达州市","雅安市","巴中市","资阳市","阿坝藏族羌族自治州","甘孜藏族自治州","凉山彝族自治州"],
+      "贵州省": ["贵阳市","六盘水市","遵义市","安顺市","毕节市","铜仁市","黔西南布依族苗族自治州","黔东南苗族侗族自治州","黔南布依族苗族自治州"],
+      "云南省": ["昆明市","曲靖市","玉溪市","保山市","昭通市","丽江市","普洱市","临沧市","楚雄彝族自治州","红河哈尼族彝族自治州","文山壮族苗族自治州","西双版纳傣族自治州","大理白族自治州","德宏傣族景颇族自治州","怒江傈僳族自治州","迪庆藏族自治州"],
+      "陕西省": ["西安市","铜川市","宝鸡市","咸阳市","渭南市","延安市","汉中市","榆林市","安康市","商洛市"],
+      "甘肃省": ["兰州市","嘉峪关市","金昌市","白银市","天水市","武威市","张掖市","平凉市","酒泉市","庆阳市","定西市","陇南市","临夏回族自治州","甘南藏族自治州"],
+      "青海省": ["西宁市","海东市","海北藏族自治州","黄南藏族自治州","海南藏族自治州","果洛藏族自治州","玉树藏族自治州","海西蒙古族藏族自治州"],
+      "内蒙古自治区": ["呼和浩特市","包头市","乌海市","赤峰市","通辽市","鄂尔多斯市","呼伦贝尔市","巴彦淖尔市","乌兰察布市","兴安盟","锡林郭勒盟","阿拉善盟"],
+      "广西壮族自治区": ["南宁市","柳州市","桂林市","梧州市","北海市","防城港市","钦州市","贵港市","玉林市","百色市","贺州市","河池市","来宾市","崇左市"],
+      "西藏自治区": ["拉萨市","日喀则市","昌都市","林芝市","山南市","那曲市","阿里地区"],
+      "宁夏回族自治区": ["银川市","石嘴山市","吴忠市","固原市","中卫市"],
+      "新疆维吾尔自治区": ["乌鲁木齐市","克拉玛依市","吐鲁番市","哈密市","昌吉回族自治州","博尔塔拉蒙古自治州","巴音郭楞蒙古自治州","阿克苏地区","克孜勒苏柯尔克孜自治州","喀什地区","和田地区","伊犁哈萨克自治州","塔城地区","阿勒泰地区","石河子市","阿拉尔市","图木舒克市","五家渠市","北屯市","铁门关市","双河市","可克达拉市","昆玉市","胡杨河市","新星市","白杨市"],
+      "香港特别行政区": ["香港特别行政区"],
+      "澳门特别行政区": ["澳门特别行政区"],
+      "台湾省": ["台北市","新北市","桃园市","台中市","台南市","高雄市","基隆市","新竹市","嘉义市"]
+    };
+
+    function initRegionPicker(isEdit) {
+      const picker = body.querySelector(".region-picker");
+      if (!picker) return;
+      const trigger = picker.querySelector(".region-trigger");
+      const triggerText = picker.querySelector(".region-trigger-text");
+      const panel = picker.querySelector(".region-panel");
+      const tree = picker.querySelector(".region-tree");
+      const search = picker.querySelector(".region-search");
+      const selectAll = picker.querySelector(".region-select-all");
+      const summary = picker.querySelector(".selected-summary b");
+      const tags = picker.querySelector(".selected-tags");
+      const selected = new Set();
+      const totalCities = Object.values(chinaRegions).reduce((sum, cities) => sum + cities.length, 0);
+
+      Object.entries(chinaRegions).forEach(([province, cities]) => {
+        const row = document.createElement("div");
+        row.className = "province-row";
+        row.dataset.province = province;
+
+        const head = document.createElement("div");
+        head.className = "province-head";
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "province-toggle";
+        toggle.textContent = "›";
+
+        const provinceLabel = document.createElement("label");
+        provinceLabel.className = "check-label";
+        const provinceCheck = document.createElement("input");
+        provinceCheck.type = "checkbox";
+        provinceCheck.className = "province-checkbox";
+        const provinceName = document.createElement("span");
+        provinceName.className = "province-name";
+        provinceName.textContent = province;
+        const progress = document.createElement("span");
+        progress.className = "province-progress";
+        progress.textContent = `0/${cities.length}`;
+        provinceLabel.append(provinceCheck, provinceName, progress);
+        head.append(toggle, provinceLabel);
+
+        const cityGrid = document.createElement("div");
+        cityGrid.className = "city-grid";
+        cities.forEach(city => {
+          const label = document.createElement("label");
+          label.className = "check-label city-option";
+          label.dataset.city = city;
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "city-checkbox";
+          checkbox.dataset.key = `${province}|${city}`;
+          const cityName = document.createElement("span");
+          cityName.textContent = city;
+          label.append(checkbox, cityName);
+          cityGrid.append(label);
+        });
+        row.append(head, cityGrid);
+        tree.append(row);
+
+        toggle.addEventListener("click", () => row.classList.toggle("open"));
+        provinceCheck.addEventListener("change", () => {
+          cityGrid.querySelectorAll(".city-checkbox").forEach(cityCheck => {
+            cityCheck.checked = provinceCheck.checked;
+            if (cityCheck.checked) selected.add(cityCheck.dataset.key);
+            else selected.delete(cityCheck.dataset.key);
+          });
+          updateSelection();
+        });
+        cityGrid.addEventListener("change", event => {
+          if (!event.target.classList.contains("city-checkbox")) return;
+          if (event.target.checked) selected.add(event.target.dataset.key);
+          else selected.delete(event.target.dataset.key);
+          updateSelection();
+        });
+      });
+
+      function updateSelection() {
+        tree.querySelectorAll(".province-row").forEach(row => {
+          const cityChecks = [...row.querySelectorAll(".city-checkbox")];
+          const checkedCount = cityChecks.filter(item => item.checked).length;
+          const provinceCheck = row.querySelector(".province-checkbox");
+          provinceCheck.checked = checkedCount === cityChecks.length;
+          provinceCheck.indeterminate = checkedCount > 0 && checkedCount < cityChecks.length;
+          row.querySelector(".province-progress").textContent = `${checkedCount}/${cityChecks.length}`;
+        });
+        selectAll.checked = selected.size === totalCities;
+        selectAll.indeterminate = selected.size > 0 && selected.size < totalCities;
+        summary.textContent = selected.size;
+        trigger.classList.toggle("has-value", selected.size > 0);
+        triggerText.textContent = selected.size ? `已选择 ${selected.size} 个城市` : "请选择省/市，支持多选";
+
+        const tagNames = [];
+        Object.entries(chinaRegions).forEach(([province, cities]) => {
+          const selectedCities = cities.filter(city => selected.has(`${province}|${city}`));
+          if (selectedCities.length === cities.length) tagNames.push(province);
+          else tagNames.push(...selectedCities);
+        });
+        const visibleTags = tagNames.slice(0, 8);
+        if (tagNames.length > 8) visibleTags.push(`+${tagNames.length - 8}`);
+        tags.innerHTML = "";
+        visibleTags.forEach(name => {
+          const tag = document.createElement("span");
+          tag.className = "selected-tag";
+          tag.textContent = name;
+          tags.append(tag);
+        });
+      }
+
+      trigger.addEventListener("click", () => panel.classList.toggle("show"));
+      picker.querySelector(".region-confirm").addEventListener("click", () => panel.classList.remove("show"));
+      selectAll.addEventListener("change", () => {
+        tree.querySelectorAll(".city-checkbox").forEach(cityCheck => {
+          cityCheck.checked = selectAll.checked;
+          if (cityCheck.checked) selected.add(cityCheck.dataset.key);
+          else selected.delete(cityCheck.dataset.key);
+        });
+        updateSelection();
+      });
+      search.addEventListener("input", () => {
+        const keyword = search.value.trim().toLowerCase();
+        tree.querySelectorAll(".province-row").forEach(row => {
+          const provinceMatched = row.dataset.province.toLowerCase().includes(keyword);
+          let cityMatched = false;
+          row.querySelectorAll(".city-option").forEach(option => {
+            const matched = !keyword || provinceMatched || option.dataset.city.toLowerCase().includes(keyword);
+            option.classList.toggle("filtered-out", !matched);
+            if (matched) cityMatched = true;
+          });
+          row.classList.toggle("filtered-out", !provinceMatched && !cityMatched);
+          if (keyword && cityMatched) row.classList.add("open");
+        });
+      });
+
+      if (isEdit) {
+        ["上海市", "江苏省", "浙江省"].forEach(province => {
+          tree.querySelectorAll(".province-row").forEach(row => {
+            if (row.dataset.province !== province) return;
+            row.querySelectorAll(".city-checkbox").forEach(cityCheck => {
+              cityCheck.checked = true;
+              selected.add(cityCheck.dataset.key);
+            });
+          });
+        });
+      }
+      updateSelection();
+    }
+
+    function initRateEditors(root) {
+      root.querySelectorAll(".rate-editor").forEach(editor => {
+        const list = editor.querySelector(".tier-list");
+        const addButton = editor.querySelector(".add-tier");
+        let nextTier = 1;
+
+        function refreshTierIndexes() {
+          list.querySelectorAll(".tier-item").forEach((item, index) => {
+            item.querySelector(".tier-index").textContent = `阶梯 ${index + 1}`;
+          });
+        }
+
+        function addTier() {
+          const tierNumber = nextTier++;
+          const startWeight = tierNumber === 1 ? 1 : tierNumber * 5;
+          const endWeight = tierNumber === 1 ? 5 : (tierNumber + 1) * 5;
+          const price = tierNumber === 1 ? "1.80" : "1.50";
+          const item = document.createElement("div");
+          item.className = "tier-item";
+          item.innerHTML = `
+            <span class="tier-index">阶梯 ${tierNumber}</span>
+            <input type="number" min="0" value="${startWeight}" aria-label="阶梯起始重量" />
+            <span class="unit">至</span>
+            <input type="number" min="0" value="${endWeight}" aria-label="阶梯结束重量" />
+            <span class="unit">kg，每</span>
+            <input type="number" min="0.1" step="0.1" value="1" aria-label="阶梯计价单位" />
+            <span class="unit">kg</span>
+            <input type="number" min="0" step="0.01" value="${price}" aria-label="阶梯单价" />
+            <span class="unit">元</span>
+            <button type="button" class="remove-tier" aria-label="删除阶梯">×</button>
+          `;
+          item.querySelector(".remove-tier").addEventListener("click", () => {
+            item.remove();
+            refreshTierIndexes();
+          });
+          list.append(item);
+          refreshTierIndexes();
+        }
+
+        addButton.addEventListener("click", addTier);
+      });
+    }
+
+    function initBusinessPriceMode(isEdit) {
+      const radios = [...body.querySelectorAll(".price-mode-radio")];
+      const templateFields = body.querySelector(".template-price-fields");
+      const manualFields = body.querySelector(".manual-price-fields");
+      if (!radios.length || !templateFields || !manualFields) return;
+
+      function updatePriceMode() {
+        const selected = radios.find(radio => radio.checked)?.value || "template";
+        templateFields.classList.toggle("hidden", selected !== "template");
+        manualFields.classList.toggle("hidden", selected !== "manual");
+      }
+
+      if (isEdit) {
+        const manualRadio = radios.find(radio => radio.value === "manual");
+        manualRadio.checked = true;
+      }
+      radios.forEach(radio => radio.addEventListener("change", updatePriceMode));
+      updatePriceMode();
+    }
+
+    const navItems = document.querySelectorAll(".nav-item");
+    navItems.forEach(item => item.addEventListener("click", () => {
+      navItems.forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.getElementById("page-" + item.dataset.page).classList.add("active");
+      document.getElementById("crumbTitle").textContent = pages[item.dataset.page].title;
+    }));
+
+    const overlay = document.getElementById("overlay");
+    const body = document.getElementById("drawerBody");
+    const title = document.getElementById("drawerTitle");
+    const titles = {
+      base: "新建快递公司", "base-edit": "修改快递公司",
+      region: "新建区域模板", "region-edit": "修改区域模板",
+      business: "新增业务线配置", "business-edit": "修改业务线配置"
+    };
+    function openDrawer(type) {
+      const rootType = type.split("-")[0];
+      title.textContent = titles[type];
+      body.innerHTML = document.getElementById("form-" + rootType).innerHTML;
+      if (type.includes("edit")) {
+        const inputs = body.querySelectorAll("input");
+        if (rootType === "base") { inputs[0].value = "顺丰速运"; inputs[1].value = "SF"; }
+        if (rootType === "region") {
+          body.querySelector('input[placeholder="例如：江浙沪核心区"]').value = "江浙沪核心区";
+          body.querySelector('input[placeholder="例如：1-2 天"]').value = "次日达";
+        }
+        if (rootType === "business") { inputs[0].value = "顺丰标快"; inputs[2].value = "顺丰速运"; }
+      }
+      if (rootType === "region") initRegionPicker(type.includes("edit"));
+      initRateEditors(body);
+      if (rootType === "business") initBusinessPriceMode(type.includes("edit"));
+      overlay.classList.add("show");
+    }
+    document.querySelectorAll(".open-drawer").forEach(btn => btn.addEventListener("click", () => openDrawer(btn.dataset.form)));
+    function closeDrawer() { overlay.classList.remove("show"); }
+    document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
+    document.getElementById("cancelDrawer").addEventListener("click", closeDrawer);
+    overlay.addEventListener("click", e => { if (e.target === overlay) closeDrawer(); });
+    document.getElementById("saveDrawer").addEventListener("click", () => {
+      closeDrawer();
+      const toast = document.getElementById("toast");
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1800);
+    });
+
+    const helpOverlay = document.getElementById("helpOverlay");
+    function openHelp() { helpOverlay.classList.add("show"); }
+    function closeHelp() { helpOverlay.classList.remove("show"); }
+    document.getElementById("helpButton").addEventListener("click", openHelp);
+    document.getElementById("closeHelp").addEventListener("click", closeHelp);
+    document.getElementById("confirmHelp").addEventListener("click", closeHelp);
+    helpOverlay.addEventListener("click", event => {
+      if (event.target === helpOverlay) closeHelp();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && helpOverlay.classList.contains("show")) closeHelp();
+    });
+
+    document.querySelectorAll("tbody .link:not(.open-drawer)").forEach(btn => btn.addEventListener("click", () => {
+      const toast = document.getElementById("toast");
+      toast.textContent = btn.textContent + "操作已完成";
+      toast.classList.add("show");
+      setTimeout(() => { toast.classList.remove("show"); toast.textContent = "保存成功，配置已更新"; }, 1600);
+    }));
+  </script>
+</body>
+</html>
