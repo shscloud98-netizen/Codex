@@ -276,6 +276,21 @@
 
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+    th:first-child, td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: #fff;
+      box-shadow: 8px 0 12px -12px rgba(28, 43, 75, .35);
+    }
+    th:last-child, td:last-child {
+      position: sticky;
+      right: 0;
+      z-index: 1;
+      background: #fff;
+      box-shadow: -8px 0 12px -12px rgba(28, 43, 75, .35);
+    }
+    th:first-child, th:last-child { z-index: 2; background: #f7f9fc; }
     th {
       padding: 13px 15px;
       color: #6a7489;
@@ -362,6 +377,8 @@
       color: #657089;
     }
     .page-btn.active { color: #fff; border-color: var(--brand); background: var(--brand); }
+    .page-btn:disabled { color: #b3bac8; background: #f7f8fa; cursor: not-allowed; }
+    tbody tr.filtered-out { display: none; }
 
     .coverage {
       display: flex;
@@ -445,6 +462,11 @@
       border-radius: 8px;
       outline: none;
       background: #fff;
+    }
+    .origin-selects { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .field.invalid input, .field.invalid select, .region-picker.invalid .region-trigger {
+      border-color: #e65858;
+      box-shadow: 0 0 0 3px rgba(230, 88, 88, .08);
     }
     .field-help { margin-top: 6px; color: #9199a9; font-size: 11px; line-height: 1.5; }
     .region-trigger {
@@ -580,6 +602,21 @@
     }
     .check-card:has(input:checked) { color: var(--brand) !important; border-color: #86a4f5; background: var(--brand-soft); }
     .check-card input { width: 15px; height: 15px; accent-color: var(--brand); }
+    .product-list { display: grid; gap: 12px; }
+    .product-item {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbfcff;
+    }
+    .product-item-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .product-item-title { color: #35415a; font-size: 13px; font-weight: 700; }
+    .product-item-grid { display: grid; grid-template-columns: 1.2fr 1fr .8fr .7fr; gap: 10px; }
+    .product-item .checkbox-grid { grid-column: 1 / -1; }
+    .product-empty-error { display: none; margin-top: 8px; color: #dc4848; font-size: 12px; }
+    .product-list.invalid + .product-empty-error { display: block; }
+    .product-summary { display: flex; flex-wrap: wrap; gap: 5px; max-width: 360px; }
+    .product-chip { padding: 4px 8px; color: #3457b7; border: 1px solid #dce5ff; border-radius: 999px; background: #f3f6ff; font-size: 11px; }
     .field-error { display: none; margin-top: 6px; color: var(--danger); font-size: 11px; }
     .field-error.show { display: block; }
     .type-price-section.hidden, .type-no-price-section.hidden { display: none; }
@@ -632,6 +669,7 @@
       font-size: 12px;
       line-height: 1.5;
     }
+    .manual-region-field { margin-bottom: 12px; }
     .tier-list {
       margin-top: 12px;
       display: grid;
@@ -836,7 +874,7 @@
         <div class="crumb">系统设置 <span>／</span><strong id="crumbTitle">基础管理</strong></div>
         <div class="top-actions">
           <button class="help" id="helpButton">原型说明</button>
-          <button class="icon-btn" title="消息">●</button>
+          <button class="icon-btn" id="messageButton" title="消息" aria-label="消息">●</button>
         </div>
       </header>
 
@@ -844,41 +882,41 @@
         <section class="page active" id="page-base">
           <div class="page-head">
             <div>
-              <h1>基本快递信息配置</h1>
-              <p class="page-desc">维护快递公司基础档案及支持的快递类型，作为区域、计价模板和业务线配置的统一数据来源。</p>
+              <h1>快递公司及产品配置</h1>
+              <p class="page-desc">维护承运商及其服务产品，产品是区域、时效、计价和业务线配置的最小引用单元。</p>
             </div>
             <button class="btn btn-primary open-drawer" data-form="base">＋ 新建快递公司</button>
           </div>
 
           <div class="metrics">
             <div class="metric"><div class="metric-icon">运</div><div><div class="metric-value">5</div><div class="metric-label">快递公司总数</div></div></div>
-            <div class="metric"><div class="metric-icon">✓</div><div><div class="metric-value">4</div><div class="metric-label">当前已启用</div></div></div>
-            <div class="metric"><div class="metric-icon">更</div><div><div class="metric-value">06-24 10:36</div><div class="metric-label">最近更新时间</div></div></div>
+            <div class="metric"><div class="metric-icon">品</div><div><div class="metric-value">9</div><div class="metric-label">快递产品总数</div></div></div>
+            <div class="metric"><div class="metric-icon">✓</div><div><div class="metric-value">8</div><div class="metric-label">已启用产品</div></div></div>
           </div>
 
           <div class="panel">
             <div class="toolbar">
               <div class="filters">
-                <input class="search" placeholder="搜索快递公司名称/简称" />
-                <select class="select"><option>全部状态</option><option>启用</option><option>禁用</option></select>
-                <button class="btn btn-sm">查询</button>
-                <button class="btn btn-sm">重置</button>
+                <input class="search list-keyword" placeholder="搜索公司/产品名称/产品编码" />
+                <select class="select list-status"><option>全部状态</option><option>启用</option><option>禁用</option></select>
+                <button class="btn btn-sm query-list">查询</button>
+                <button class="btn btn-sm reset-list">重置</button>
               </div>
               <div class="toolbar-note">共 5 条数据</div>
             </div>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>序号</th><th>物流公司名称</th><th>英文简称</th><th>快递类型</th><th>状态</th><th>创建时间</th><th>更新时间</th><th>创建人</th><th>操作</th></tr></thead>
+                <thead><tr><th>序号</th><th>快递公司</th><th>英文简称</th><th>服务产品</th><th>支持方式</th><th>状态</th><th>更新时间</th><th>创建人</th><th>操作</th></tr></thead>
                 <tbody>
-                  <tr><td>01</td><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>SF</td><td><div class="type-list"><span class="type-chip">寄付</span><span class="type-chip">到付</span><span class="type-chip">自提</span></div></td><td><span class="tag tag-on">启用</span></td><td>2026-03-12 09:25</td><td>2026-06-24 10:36</td><td>林晓</td><td><button class="link open-drawer" data-form="base-edit">修改</button><button class="link">禁用</button></td></tr>
-                  <tr><td>02</td><td><div class="company"><span class="company-logo orange">YTO</span>圆通速递</div></td><td>YTO</td><td><div class="type-list"><span class="type-chip">寄付</span><span class="type-chip">到付</span></div></td><td><span class="tag tag-on">启用</span></td><td>2026-03-12 09:30</td><td>2026-06-20 15:18</td><td>林晓</td><td><button class="link open-drawer" data-form="base-edit">修改</button><button class="link">禁用</button></td></tr>
-                  <tr><td>03</td><td><div class="company"><span class="company-logo red">JD</span>京东物流</div></td><td>JD</td><td><div class="type-list"><span class="type-chip">寄付</span><span class="type-chip">到付</span><span class="type-chip">自提</span></div></td><td><span class="tag tag-on">启用</span></td><td>2026-03-12 09:38</td><td>2026-06-18 11:02</td><td>周明</td><td><button class="link open-drawer" data-form="base-edit">修改</button><button class="link">禁用</button></td></tr>
-                  <tr><td>04</td><td><div class="company"><span class="company-logo green">ZTO</span>中通快递</div></td><td>ZTO</td><td><div class="type-list"><span class="type-chip">寄付</span><span class="type-chip">自提</span></div></td><td><span class="tag tag-on">启用</span></td><td>2026-03-12 09:42</td><td>2026-05-08 16:40</td><td>周明</td><td><button class="link open-drawer" data-form="base-edit">修改</button><button class="link">禁用</button></td></tr>
-                  <tr><td>05</td><td><div class="company"><span class="company-logo purple">STO</span>申通快递</div></td><td>STO</td><td><div class="type-list"><span class="type-chip">寄付</span><span class="type-chip">自提</span></div></td><td><span class="tag tag-off">禁用</span></td><td>2026-04-02 14:15</td><td>2026-06-01 09:12</td><td>林晓</td><td><button class="link open-drawer" data-form="base-edit">修改</button><button class="link">启用</button></td></tr>
+                  <tr data-status="启用" data-downstream-count="6"><td>01</td><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>SF</td><td><div class="product-summary"><span class="product-chip">顺丰标快</span><span class="product-chip">顺丰特快</span><span class="product-chip">顺丰卡航</span></div></td><td><div class="type-list"><span class="type-chip">寄付</span><span class="type-chip">到付</span><span class="type-chip">自提</span></div></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-18 10:36</td><td>林晓</td><td><button class="link open-drawer" data-form="base-edit" data-company="顺丰速运" data-abbr="SF">修改</button><button class="link status-action">禁用</button></td></tr>
+                  <tr data-status="启用" data-downstream-count="2"><td>02</td><td><div class="company"><span class="company-logo orange">YTO</span>圆通速递</div></td><td>YTO</td><td><div class="product-summary"><span class="product-chip">圆通标准快递</span></div></td><td><div class="type-list"><span class="type-chip">寄付</span><span class="type-chip">到付</span></div></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-18 09:18</td><td>林晓</td><td><button class="link open-drawer" data-form="base-edit" data-company="圆通速递" data-abbr="YTO">修改</button><button class="link status-action">禁用</button></td></tr>
+                  <tr data-status="启用" data-downstream-count="4"><td>03</td><td><div class="company"><span class="company-logo red">JD</span>京东物流</div></td><td>JD</td><td><div class="product-summary"><span class="product-chip">京东标快</span><span class="product-chip">京东特快</span><span class="product-chip">特快重货</span></div></td><td><div class="type-list"><span class="type-chip">寄付</span><span class="type-chip">到付</span><span class="type-chip">自提</span></div></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-18 09:02</td><td>周明</td><td><button class="link open-drawer" data-form="base-edit" data-company="京东物流" data-abbr="JD">修改</button><button class="link status-action">禁用</button></td></tr>
+                  <tr data-status="启用" data-downstream-count="2"><td>04</td><td><div class="company"><span class="company-logo green">ZTO</span>中通快递</div></td><td>ZTO</td><td><div class="product-summary"><span class="product-chip">中通标准快递</span></div></td><td><div class="type-list"><span class="type-chip">寄付</span><span class="type-chip">自提</span></div></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-17 16:40</td><td>周明</td><td><button class="link open-drawer" data-form="base-edit" data-company="中通快递" data-abbr="ZTO">修改</button><button class="link status-action">禁用</button></td></tr>
+                  <tr data-status="禁用" data-downstream-count="0"><td>05</td><td><div class="company"><span class="company-logo purple">STO</span>申通快递</div></td><td>STO</td><td><div class="product-summary"><span class="product-chip">申通标准快递</span></div></td><td><div class="type-list"><span class="type-chip">寄付</span><span class="type-chip">自提</span></div></td><td><span class="tag tag-off row-status">禁用</span></td><td>2026-06-01 09:12</td><td>林晓</td><td><button class="link open-drawer" data-form="base-edit" data-company="申通快递" data-abbr="STO">修改</button><button class="link status-action">启用</button></td></tr>
                 </tbody>
               </table>
             </div>
-            <div class="pagination"><button class="page-btn">‹</button><button class="page-btn active">1</button><button class="page-btn">›</button></div>
+            <div class="pagination"><button class="page-btn" disabled>‹</button><button class="page-btn active">1</button><button class="page-btn" disabled>›</button></div>
           </div>
         </section>
 
@@ -886,29 +924,31 @@
           <div class="page-head">
             <div>
               <h1>可送达区域管理</h1>
-              <p class="page-desc">按寄付、到付、自提分别配置运输区域与承诺时效；仅寄付维护计价规则。</p>
+              <p class="page-desc">按始发城市、快递公司、服务产品和服务方式配置范围、承诺时效与价格。</p>
             </div>
             <button class="btn btn-primary open-drawer" data-form="region">＋ 新建区域模板</button>
           </div>
           <div class="panel">
             <div class="toolbar">
               <div class="filters">
-                <input class="search" placeholder="搜索运输区域" />
-                <select class="select"><option>全部快递公司</option><option>顺丰速运</option><option>圆通速递</option></select>
-                <select class="select"><option>全部快递类型</option><option>寄付</option><option>到付</option><option>自提</option></select>
-                <select class="select"><option>全部状态</option><option>启用</option><option>禁用</option></select>
-                <button class="btn btn-sm">查询</button>
+                <input class="search list-keyword" placeholder="搜索模板/始发地/可送达区域" />
+                <select class="select list-company"><option>全部快递公司</option><option>顺丰速运</option><option>圆通速递</option><option>京东物流</option><option>中通快递</option></select>
+                <select class="select list-product"><option>全部服务产品</option><option>顺丰标快</option><option>顺丰特快</option><option>圆通标准快递</option><option>京东标快</option><option>特快重货</option><option>中通标准快递</option></select>
+                <select class="select list-express-type"><option>全部服务方式</option><option>寄付</option><option>到付</option><option>自提</option></select>
+                <select class="select list-status"><option>全部状态</option><option>启用</option><option>禁用</option></select>
+                <button class="btn btn-sm query-list">查询</button>
+                <button class="btn btn-sm reset-list">重置</button>
               </div>
               <div class="toolbar-note">共 4 条区域模板</div>
             </div>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>模板名称</th><th>快递公司</th><th>快递类型</th><th>运输区域</th><th>运输时效</th><th>基础计价模板</th><th>状态</th><th>更新时间</th><th>操作</th></tr></thead>
+                <thead><tr><th>模板名称</th><th>快递公司</th><th>服务产品</th><th>服务方式</th><th>始发地</th><th>可送达区域</th><th>运输时效</th><th>基础计价模板</th><th>状态</th><th>更新时间</th><th>操作</th></tr></thead>
                 <tbody>
-                  <tr><td><b>江浙沪核心区</b></td><td>顺丰速运</td><td><span class="type-chip">寄付</span></td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span></div></td><td>次日达</td><td class="rule-cell">首重 <b>1kg / ¥12.00</b><br><span class="muted">续重每 1kg 加 ¥2.00</span></td><td><span class="tag tag-on">启用</span></td><td>2026-06-24 09:30</td><td><button class="link open-drawer" data-form="region-edit" data-express-type="寄付">修改</button><button class="link">禁用</button><button class="link danger">删除</button></td></tr>
-                  <tr><td><b>华东经济区</b></td><td>圆通速递</td><td><span class="type-chip">寄付</span></td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span><span>安徽</span></div></td><td>1-2 天</td><td class="rule-cell">首重 <b>1kg / ¥8.00</b><br><span class="muted">续重每 1kg 加 ¥1.50</span></td><td><span class="tag tag-on">启用</span></td><td>2026-06-22 14:18</td><td><button class="link open-drawer" data-form="region-edit" data-express-type="寄付">修改</button><button class="link">禁用</button><button class="link danger">删除</button></td></tr>
-                  <tr><td><b>全国到付区</b></td><td>京东物流</td><td><span class="type-chip">到付</span></td><td><div class="coverage"><span>全国 28 省</span></div></td><td>2-3 天</td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on">启用</span></td><td>2026-06-18 11:05</td><td><button class="link open-drawer" data-form="region-edit" data-express-type="到付">修改</button><button class="link">禁用</button><button class="link danger">删除</button></td></tr>
-                  <tr><td><b>直营网点自提</b></td><td>中通快递</td><td><span class="type-chip">自提</span></td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span></div></td><td>当日可提</td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-off">禁用</span></td><td>2026-05-08 16:40</td><td><button class="link open-drawer" data-form="region-edit" data-express-type="自提">修改</button><button class="link">启用</button><button class="link danger">删除</button></td></tr>
+                  <tr data-company="顺丰速运" data-product="顺丰标快" data-express-type="寄付" data-status="启用"><td><b>标快·江浙沪核心区</b></td><td>顺丰速运</td><td>顺丰标快</td><td><span class="type-chip">寄付</span></td><td>广东省 / 深圳市</td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span></div></td><td>次日达</td><td class="rule-cell">首重 <b>1kg / ¥12.00</b><br><span class="muted">续重每 1kg 加 ¥2.00</span></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-18 09:30</td><td><button class="link open-drawer" data-form="region-edit" data-template-name="标快·江浙沪核心区" data-company="顺丰速运" data-product="顺丰标快" data-express-type="寄付" data-origin-province="广东省" data-origin-city="深圳市" data-sla="次日达" data-region-provinces="上海市,江苏省,浙江省">修改</button><button class="link status-action">禁用</button><button class="link danger delete-action">删除</button></td></tr>
+                  <tr data-company="圆通速递" data-product="圆通标准快递" data-express-type="寄付" data-status="启用"><td><b>圆通标快·华东区</b></td><td>圆通速递</td><td>圆通标准快递</td><td><span class="type-chip">寄付</span></td><td>广东省 / 东莞市</td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span><span>安徽</span></div></td><td>1-2 天</td><td class="rule-cell">首重 <b>1kg / ¥8.00</b><br><span class="muted">续重每 1kg 加 ¥1.50</span></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-18 08:18</td><td><button class="link open-drawer" data-form="region-edit" data-template-name="圆通标快·华东区" data-company="圆通速递" data-product="圆通标准快递" data-express-type="寄付" data-origin-province="广东省" data-origin-city="东莞市" data-sla="1-2 天" data-region-provinces="上海市,江苏省,浙江省,安徽省">修改</button><button class="link status-action">禁用</button><button class="link danger delete-action">删除</button></td></tr>
+                  <tr data-company="京东物流" data-product="京东标快" data-express-type="到付" data-status="启用"><td><b>京东标快·全国到付区</b></td><td>京东物流</td><td>京东标快</td><td><span class="type-chip">到付</span></td><td>广东省 / 深圳市</td><td><div class="coverage"><span>全国</span></div></td><td>2-3 天</td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-18 08:05</td><td><button class="link open-drawer" data-form="region-edit" data-template-name="京东标快·全国到付区" data-company="京东物流" data-product="京东标快" data-express-type="到付" data-origin-province="广东省" data-origin-city="深圳市" data-sla="2-3 天" data-select-all="true">修改</button><button class="link status-action">禁用</button><button class="link danger delete-action">删除</button></td></tr>
+                  <tr data-company="中通快递" data-product="中通标准快递" data-express-type="自提" data-status="禁用"><td><b>中通标快·网点自提</b></td><td>中通快递</td><td>中通标准快递</td><td><span class="type-chip">自提</span></td><td>广东省 / 深圳市</td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span></div></td><td>当日可提</td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-off row-status">禁用</span></td><td>2026-07-17 16:40</td><td><button class="link open-drawer" data-form="region-edit" data-template-name="中通标快·网点自提" data-company="中通快递" data-product="中通标准快递" data-express-type="自提" data-origin-province="广东省" data-origin-city="深圳市" data-sla="当日可提" data-region-provinces="上海市,江苏省,浙江省">修改</button><button class="link status-action">启用</button><button class="link danger delete-action">删除</button></td></tr>
                 </tbody>
               </table>
             </div>
@@ -919,32 +959,34 @@
           <div class="page-head">
             <div>
               <h1>业务线单价配置</h1>
-              <p class="page-desc">按业务线和快递类型分别配置展示信息；寄付配置价格，到付与自提无需价格。</p>
+              <p class="page-desc">按业务线、快递产品和服务方式分别配置展示与价格，避免不同产品共用错误报价。</p>
             </div>
             <button class="btn btn-primary open-drawer" data-form="business">＋ 新增业务线配置</button>
           </div>
           <div class="panel">
             <div class="toolbar">
               <div class="filters">
-                <input class="search" placeholder="搜索快递公司/业务线" />
-                <select class="select"><option>全部业务线</option><option>商城订单</option><option>供应链调拨</option><option>售后寄回</option></select>
-                <select class="select"><option>全部快递类型</option><option>寄付</option><option>到付</option><option>自提</option></select>
-                <select class="select"><option>全部状态</option><option>启用</option><option>禁用</option></select>
-                <button class="btn btn-sm">查询</button>
+                <input class="search list-keyword" placeholder="搜索快递公司/服务产品/业务线" />
+                <select class="select list-business-line"><option>全部业务线</option><option>商城订单</option><option>供应链调拨</option><option>售后寄回</option></select>
+                <select class="select list-product"><option>全部服务产品</option><option>顺丰标快</option><option>顺丰特快</option><option>京东标快</option><option>圆通标准快递</option><option>中通标准快递</option></select>
+                <select class="select list-express-type"><option>全部服务方式</option><option>寄付</option><option>到付</option><option>自提</option></select>
+                <select class="select list-status"><option>全部状态</option><option>启用</option><option>禁用</option></select>
+                <button class="btn btn-sm query-list">查询</button>
+                <button class="btn btn-sm reset-list">重置</button>
               </div>
               <div class="toolbar-note">共 7 条配置</div>
             </div>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>快递公司</th><th>调用业务线</th><th>快递类型</th><th>前端展示</th><th>后端展示</th><th>快递价格</th><th>状态</th><th>操作</th></tr></thead>
+                <thead><tr><th>快递公司</th><th>服务产品</th><th>调用业务线</th><th>服务方式</th><th>前端展示</th><th>后端展示</th><th>快递价格</th><th>状态</th><th>操作</th></tr></thead>
                 <tbody>
-                  <tr><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>商城订单</td><td><span class="type-chip">寄付</span></td><td>顺丰标快 <span class="muted">#1</span></td><td>顺丰速运 <span class="muted">#10</span></td><td><span class="tag tag-warn">单独配置</span> <span class="price">¥13.50 起</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-express-type="寄付">修改</button></td></tr>
-                  <tr><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>商城订单</td><td><span class="type-chip">到付</span></td><td>顺丰到付 <span class="muted">#2</span></td><td>顺丰到付 <span class="muted">#11</span></td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-express-type="到付">修改</button></td></tr>
-                  <tr><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>商城订单</td><td><span class="type-chip">自提</span></td><td>网点自提 <span class="muted">#3</span></td><td>顺丰自提 <span class="muted">#12</span></td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-express-type="自提">修改</button></td></tr>
-                  <tr><td><div class="company"><span class="company-logo red">JD</span>京东物流</div></td><td>商城订单</td><td><span class="type-chip">寄付</span></td><td>京东快递 <span class="muted">#4</span></td><td>京东物流 <span class="muted">#20</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">全国标准区</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-express-type="寄付">修改</button></td></tr>
-                  <tr><td><div class="company"><span class="company-logo orange">YTO</span>圆通速递</div></td><td>供应链调拨</td><td><span class="type-chip">寄付</span></td><td>圆通物流 <span class="muted">#5</span></td><td>圆通速递 <span class="muted">#30</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">华东经济区</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-express-type="寄付">修改</button></td></tr>
-                  <tr><td><div class="company"><span class="company-logo green">ZTO</span>中通快递</div></td><td>售后寄回</td><td><span class="type-chip">寄付</span></td><td>中通快递 <span class="muted">#6</span></td><td>中通快递 <span class="muted">#40</span></td><td><span class="tag tag-warn">单独配置</span> <span class="price">¥7.00 起</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-express-type="寄付">修改</button></td></tr>
-                  <tr><td><div class="company"><span class="company-logo purple">STO</span>申通快递</div></td><td>商城订单</td><td><span class="type-chip">寄付</span></td><td>申通快递 <span class="muted">#7</span></td><td>申通快递 <span class="muted">#50</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">华东经济区</span></td><td><span class="tag tag-off">禁用</span></td><td><button class="link open-drawer" data-form="business-edit" data-express-type="寄付">修改</button></td></tr>
+                  <tr data-company="顺丰速运" data-product="顺丰标快" data-business-line="商城订单" data-express-type="寄付" data-status="启用"><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>顺丰标快</td><td>商城订单</td><td><span class="type-chip">寄付</span></td><td>顺丰标快 <span class="muted">#1</span></td><td>顺丰标快 <span class="muted">#10</span></td><td><span class="tag tag-warn">单独配置</span> <span class="muted">深圳市 → 江浙沪核心区</span> <span class="price">¥13.50 起</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="顺丰速运" data-product="顺丰标快" data-business-line="商城订单" data-express-type="寄付" data-front-name="顺丰标快" data-back-name="顺丰标快" data-price-mode="manual" data-region="sf-standard-sz-jzh">修改</button></td></tr>
+                  <tr data-company="顺丰速运" data-product="顺丰特快" data-business-line="商城订单" data-express-type="到付" data-status="启用"><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>顺丰特快</td><td>商城订单</td><td><span class="type-chip">到付</span></td><td>顺丰特快到付 <span class="muted">#2</span></td><td>顺丰特快 <span class="muted">#11</span></td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="顺丰速运" data-product="顺丰特快" data-business-line="商城订单" data-express-type="到付" data-front-name="顺丰特快到付" data-back-name="顺丰特快">修改</button></td></tr>
+                  <tr data-company="顺丰速运" data-product="顺丰标快" data-business-line="商城订单" data-express-type="自提" data-status="启用"><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>顺丰标快</td><td>商城订单</td><td><span class="type-chip">自提</span></td><td>网点自提 <span class="muted">#3</span></td><td>顺丰标快自提 <span class="muted">#12</span></td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="顺丰速运" data-product="顺丰标快" data-business-line="商城订单" data-express-type="自提" data-front-name="网点自提" data-back-name="顺丰标快自提">修改</button></td></tr>
+                  <tr data-company="京东物流" data-product="京东标快" data-business-line="商城订单" data-express-type="寄付" data-status="启用"><td><div class="company"><span class="company-logo red">JD</span>京东物流</div></td><td>京东标快</td><td>商城订单</td><td><span class="type-chip">寄付</span></td><td>京东标快 <span class="muted">#4</span></td><td>京东标快 <span class="muted">#20</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">深圳市 → 全国标准区</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="京东物流" data-product="京东标快" data-business-line="商城订单" data-express-type="寄付" data-front-name="京东标快" data-back-name="京东标快" data-price-mode="template" data-region="jd-standard-sz-national">修改</button></td></tr>
+                  <tr data-company="圆通速递" data-product="圆通标准快递" data-business-line="供应链调拨" data-express-type="寄付" data-status="启用"><td><div class="company"><span class="company-logo orange">YTO</span>圆通速递</div></td><td>圆通标准快递</td><td>供应链调拨</td><td><span class="type-chip">寄付</span></td><td>圆通标快 <span class="muted">#5</span></td><td>圆通标准快递 <span class="muted">#30</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">东莞市 → 华东区</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="圆通速递" data-product="圆通标准快递" data-business-line="供应链调拨" data-express-type="寄付" data-front-name="圆通标快" data-back-name="圆通标准快递" data-price-mode="template" data-region="yto-standard-dg-east">修改</button></td></tr>
+                  <tr data-company="中通快递" data-product="中通标准快递" data-business-line="售后寄回" data-express-type="寄付" data-status="启用"><td><div class="company"><span class="company-logo green">ZTO</span>中通快递</div></td><td>中通标准快递</td><td>售后寄回</td><td><span class="type-chip">寄付</span></td><td>中通快递 <span class="muted">#6</span></td><td>中通标准快递 <span class="muted">#40</span></td><td><span class="tag tag-warn">单独配置</span> <span class="muted">广州市 → 华南核心区</span> <span class="price">¥7.00 起</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="中通快递" data-product="中通标准快递" data-business-line="售后寄回" data-express-type="寄付" data-front-name="中通快递" data-back-name="中通标准快递" data-price-mode="manual" data-region="zto-standard-gz-south">修改</button></td></tr>
+                  <tr data-company="申通快递" data-product="申通标准快递" data-business-line="商城订单" data-express-type="寄付" data-status="禁用"><td><div class="company"><span class="company-logo purple">STO</span>申通快递</div></td><td>申通标准快递</td><td>商城订单</td><td><span class="type-chip">寄付</span></td><td>申通快递 <span class="muted">#7</span></td><td>申通标准快递 <span class="muted">#50</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">东莞市 → 华东区</span></td><td><span class="tag tag-off">禁用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="申通快递" data-product="申通标准快递" data-business-line="商城订单" data-express-type="寄付" data-front-name="申通快递" data-back-name="申通标准快递" data-price-mode="template" data-region="sto-standard-dg-east">修改</button></td></tr>
                 </tbody>
               </table>
             </div>
@@ -978,33 +1020,34 @@
       </div>
       <div class="help-modal-body">
         <div class="help-intro">
-          本原型围绕“基础数据 → 可送达区域与计价模板 → 业务线价格应用”搭建。基础快递信息是其他配置的统一数据来源。
+          本原型围绕“快递公司 → 服务产品 → 区域与计价模板 → 业务线应用”搭建。服务产品是下游配置的最小引用单元。
         </div>
         <div class="help-module-list">
           <div class="help-module">
             <div class="help-module-index">01</div>
-            <div class="help-module-title">基本快递信息配置</div>
-            <div class="help-module-text">维护快递公司名称、英文简称、快递类型、排序与启停状态。</div>
+            <div class="help-module-title">快递公司及产品配置</div>
+            <div class="help-module-text">维护承运商档案及其服务产品、产品编码、产品分类、支持方式和状态。</div>
           </div>
           <div class="help-module">
             <div class="help-module-index">02</div>
             <div class="help-module-title">可送达区域管理</div>
-            <div class="help-module-text">按快递类型选择全国省市范围；仅寄付配置首续重及阶梯报价。</div>
+            <div class="help-module-text">按始发城市、服务产品和服务方式选择全国省市范围；仅寄付配置报价。</div>
           </div>
           <div class="help-module">
             <div class="help-module-index">03</div>
             <div class="help-module-title">业务线单价配置</div>
-            <div class="help-module-text">快递类型可分开关联业务线；寄付计价，到付与自提无需价格。</div>
+            <div class="help-module-text">同一业务线可分别配置不同服务产品和服务方式；寄付计价，到付与自提无需价格。</div>
           </div>
         </div>
         <div class="help-rules">
           <div class="help-rules-title">关键规则</div>
           <ul>
-            <li>同一快递公司且同一快递类型的可送达区域不可重复覆盖。</li>
-            <li>同一业务线的寄付、到付、自提可分别建立独立配置。</li>
+            <li>“顺丰标快”等是顺丰速运的服务产品，不是子公司；公司与产品采用一对多关系。</li>
+            <li>同一始发城市、快递公司、服务产品且同一服务方式的可送达区域不可重复覆盖。</li>
+            <li>同一业务线下，不同服务产品及寄付、到付、自提可分别建立独立配置。</li>
             <li>到付与自提不配置价格，只有寄付可选择模板价格或单独配置。</li>
-            <li>模板价格随区域计价模板更新；单独配置仅对当前业务线生效。</li>
-            <li>禁用快递公司后，不再用于新增区域和业务线配置。</li>
+            <li>模板价格随区域计价模板更新；单独配置必须选择适用配送区域，仅覆盖所选区域的价格。</li>
+            <li>存在启用中的下游配置时，不允许直接禁用公司或产品；需先停用区域及业务线配置。</li>
             <li>当前为交互原型，示例数据不会持久化到服务器。</li>
           </ul>
         </div>
@@ -1020,25 +1063,18 @@
     <div class="form-section">
       <div class="section-title">基础信息</div>
       <div class="form-grid">
-        <div class="field full"><label class="required">物流公司名称</label><input value="" placeholder="请输入物流公司全称" /></div>
-        <div class="field"><label class="required">英文简称</label><input placeholder="例如：SF" /></div>
+        <div class="field"><label class="required">物流公司名称</label><input class="required-input" value="" placeholder="请输入物流公司全称" /><div class="field-error">请输入物流公司名称</div></div>
+        <div class="field"><label class="required">英文简称</label><input class="required-input" placeholder="例如：SF" /><div class="field-error">请输入英文简称</div></div>
         <div class="field"><label class="required">排序序号</label><input type="number" value="10" /></div>
-        <div class="field full express-type-field">
-          <label class="required">快递类型</label>
-          <div class="checkbox-grid">
-            <label class="check-card"><input type="checkbox" class="express-type-checkbox" value="寄付" /> 寄付</label>
-            <label class="check-card"><input type="checkbox" class="express-type-checkbox" value="到付" /> 到付</label>
-            <label class="check-card"><input type="checkbox" class="express-type-checkbox" value="自提" /> 自提</label>
-          </div>
-          <div class="field-help">支持多选，至少选择一种快递类型。</div>
-          <div class="field-error">请选择至少一种快递类型</div>
-        </div>
         <div class="field full"><label class="required">状态</label><div class="radio-row"><label class="radio"><input type="radio" name="s1" checked /> 启用</label><label class="radio"><input type="radio" name="s1" /> 禁用</label></div></div>
       </div>
     </div>
     <div class="form-section">
-      <div class="section-title">配置提示</div>
-      <div class="rate-card muted">新建完成后，可继续为该快递公司配置可送达区域及业务线价格。</div>
+      <div class="section-title">服务产品</div>
+      <div class="product-list"></div>
+      <div class="product-empty-error">至少维护一个完整的服务产品，并选择其支持方式</div>
+      <button type="button" class="link add-product" style="margin-top:12px">＋ 增加快递产品</button>
+      <div class="field-help">产品编码用于对接承运商接口；同一公司内不可重复。禁用产品前须先停用下游区域和业务线配置。</div>
     </div>
   </template>
 
@@ -1046,15 +1082,25 @@
     <div class="form-section">
       <div class="section-title">运输范围</div>
       <div class="form-grid">
-        <div class="field full"><label class="required">模板名称</label><input placeholder="例如：江浙沪核心区" /></div>
-        <div class="field"><label class="required">快递公司</label><select><option>请选择</option><option>顺丰速运</option><option>圆通速递</option><option>京东物流</option><option>中通快递</option></select></div>
+        <div class="field full"><label class="required">模板名称</label><input class="required-input" placeholder="例如：江浙沪核心区" /><div class="field-error">请输入模板名称</div></div>
+        <div class="field"><label class="required">快递公司</label><select class="company-select required-input"><option value="">请选择</option><option>顺丰速运</option><option>圆通速递</option><option>京东物流</option><option>中通快递</option></select><div class="field-error">请选择快递公司</div></div>
+        <div class="field"><label class="required">服务产品</label><select class="product-select required-input" disabled><option value="">请先选择快递公司</option></select><div class="field-help">区域、时效和报价均绑定到具体产品。</div><div class="field-error">请选择服务产品</div></div>
         <div class="field express-type-field">
-          <label class="required">快递类型</label>
-          <select class="express-type-select"><option value="">请选择快递类型</option><option value="寄付">寄付</option><option value="到付">到付</option><option value="自提">自提</option></select>
-          <div class="field-help">每条区域模板仅配置一种快递类型。</div>
-          <div class="field-error">请选择快递类型</div>
+          <label class="required">服务方式</label>
+          <select class="express-type-select"><option value="">请先选择服务产品</option></select>
+          <div class="field-help">仅显示该产品支持的寄付、到付或自提方式。</div>
+          <div class="field-error">请选择服务方式</div>
         </div>
-        <div class="field"><label class="required">运输时效</label><input placeholder="例如：1-2 天" /></div>
+        <div class="field origin-field">
+          <label class="required">始发地</label>
+          <div class="origin-selects">
+            <select class="origin-province-select"><option value="">请选择省份</option></select>
+            <select class="origin-city-select" disabled><option value="">请选择城市</option></select>
+          </div>
+          <div class="field-help">单选到城市；用于确定当前配送范围和报价的发出城市。</div>
+          <div class="field-error">请选择完整的始发省份和城市</div>
+        </div>
+        <div class="field"><label class="required">运输时效</label><input class="required-input" placeholder="例如：1-2 天" /><div class="field-error">请输入运输时效</div></div>
         <div class="field full">
           <label class="required">运输区域</label>
           <div class="region-picker">
@@ -1072,7 +1118,8 @@
             </div>
             <div class="selected-tags"></div>
           </div>
-          <div class="field-help">可按全国、省份或城市多选；同一快递公司、同一快递类型的区域范围不可重叠。</div>
+          <div class="field-help">可按全国、省份或城市多选；同一始发城市、公司、产品和服务方式的目的区域不可重叠。</div>
+          <div class="field-error region-error">请选择至少一个可送达城市</div>
         </div>
       </div>
     </div>
@@ -1103,17 +1150,18 @@
     <div class="form-section">
       <div class="section-title">关联关系</div>
       <div class="form-grid">
-        <div class="field"><label class="required">快递公司名称</label><select><option>请选择</option><option>顺丰速运</option><option>圆通速递</option><option>京东物流</option></select></div>
-        <div class="field"><label class="required">调用业务线</label><select><option>商城订单</option><option>供应链调拨</option><option>售后寄回</option></select></div>
-        <div class="field full express-type-field">
-          <label class="required">快递类型</label>
-          <select class="express-type-select"><option value="">请选择快递类型</option><option value="寄付">寄付</option><option value="到付">到付</option><option value="自提">自提</option></select>
-          <div class="field-help">同一快递公司与业务线可按寄付、到付、自提分别建立配置。</div>
-          <div class="field-error">请选择快递类型</div>
+        <div class="field"><label class="required">快递公司名称</label><select class="company-select required-input"><option value="">请选择</option><option>顺丰速运</option><option>圆通速递</option><option>京东物流</option><option>中通快递</option><option value="申通快递" disabled>申通快递（已禁用）</option></select><div class="field-error">请选择快递公司</div></div>
+        <div class="field"><label class="required">服务产品</label><select class="product-select required-input" disabled><option value="">请先选择快递公司</option></select><div class="field-error">请选择服务产品</div></div>
+        <div class="field"><label class="required">调用业务线</label><select class="business-line-select required-input"><option>商城订单</option><option>供应链调拨</option><option>售后寄回</option></select><div class="field-error">请选择业务线</div></div>
+        <div class="field express-type-field">
+          <label class="required">服务方式</label>
+          <select class="express-type-select"><option value="">请先选择服务产品</option></select>
+          <div class="field-help">同一产品与业务线可按寄付、到付、自提分别配置。</div>
+          <div class="field-error">请选择服务方式</div>
         </div>
-        <div class="field"><label class="required">前端显示名称</label><input placeholder="用户端看到的名称" /></div>
+        <div class="field"><label class="required">前端显示名称</label><input class="required-input front-name-input" placeholder="用户端看到的名称" /><div class="field-error">请输入前端显示名称</div></div>
         <div class="field"><label class="required">前端显示序号</label><input type="number" value="1" /></div>
-        <div class="field"><label class="required">后端显示名称</label><input placeholder="运营端看到的名称" /></div>
+        <div class="field"><label class="required">后端显示名称</label><input class="required-input back-name-input" placeholder="运营端看到的名称" /><div class="field-error">请输入后端显示名称</div></div>
         <div class="field"><label class="required">后端显示序号</label><input type="number" value="10" /></div>
       </div>
     </div>
@@ -1127,10 +1175,18 @@
       </div>
       <div class="field full price-mode-content template-price-fields" style="margin-top:12px">
         <label class="required">计价模板</label>
-        <select><option>请选择区域计价模板</option><option>江浙沪核心区</option><option>全国标准区</option></select>
+        <select class="template-select"><option value="">请先选择公司、产品和服务方式</option></select>
+        <div class="field-help">仅展示与当前公司、产品、寄付方式一致的区域计价模板。</div>
+        <div class="field-error">请选择计价模板</div>
       </div>
       <div class="price-mode-content manual-price-fields hidden">
-        <div class="manual-price-tip">单独配置仅对当前业务线生效，不受区域计价模板价格变更影响。</div>
+        <div class="field full manual-region-field">
+          <label class="required">适用配送区域</label>
+          <select class="manual-region-select required-input"><option value="">请先选择公司、产品和服务方式</option></select>
+          <div class="field-help">选择区域模板作为始发地、目的范围和时效依据，但不继承该模板价格。</div>
+          <div class="field-error">请选择适用配送区域</div>
+        </div>
+        <div class="manual-price-tip">单独价格仅对当前业务线和所选配送区域生效，不受区域模板价格变更影响。</div>
         <div class="rate-editor" data-editor="business">
           <div class="rate-card">
             <div class="rate-line"><span>首重</span><input value="1" aria-label="业务线首重重量" /><span class="unit">kg</span><input value="13.50" aria-label="业务线首重价格" /><span class="unit">元</span></div>
@@ -1159,6 +1215,31 @@
       region: { title: "可送达区域管理" },
       business: { title: "业务线单价配置" }
     };
+
+    const companyServiceProducts = {
+      "顺丰速运": [
+        { name: "顺丰标快", code: "SF_STANDARD", category: "快递", types: ["寄付", "到付", "自提"] },
+        { name: "顺丰特快", code: "SF_EXPRESS", category: "快递", types: ["寄付", "到付"] },
+        { name: "顺丰卡航", code: "SF_FREIGHT", category: "快运", types: ["寄付", "到付"] }
+      ],
+      "圆通速递": [{ name: "圆通标准快递", code: "YTO_STANDARD", category: "快递", types: ["寄付", "到付"] }],
+      "京东物流": [
+        { name: "京东标快", code: "JD_STANDARD", category: "快递", types: ["寄付", "到付", "自提"] },
+        { name: "京东特快", code: "JD_EXPRESS", category: "快递", types: ["寄付", "到付"] },
+        { name: "特快重货", code: "JD_HEAVY", category: "快运", types: ["寄付", "到付"] }
+      ],
+      "中通快递": [{ name: "中通标准快递", code: "ZTO_STANDARD", category: "快递", types: ["寄付", "自提"] }],
+      "申通快递": [{ name: "申通标准快递", code: "STO_STANDARD", category: "快递", types: ["寄付", "自提"] }]
+    };
+
+    const priceTemplateOptions = [
+      { value: "sf-standard-sz-jzh", company: "顺丰速运", product: "顺丰标快", type: "寄付", label: "顺丰标快｜深圳市 → 江浙沪核心区" },
+      { value: "sf-express-sz-jzh", company: "顺丰速运", product: "顺丰特快", type: "寄付", label: "顺丰特快｜深圳市 → 江浙沪特快区" },
+      { value: "jd-standard-sz-national", company: "京东物流", product: "京东标快", type: "寄付", label: "京东标快｜深圳市 → 全国标准区" },
+      { value: "yto-standard-dg-east", company: "圆通速递", product: "圆通标准快递", type: "寄付", label: "圆通标准快递｜东莞市 → 华东区" },
+      { value: "zto-standard-gz-south", company: "中通快递", product: "中通标准快递", type: "寄付", label: "中通标准快递｜广州市 → 华南核心区" },
+      { value: "sto-standard-dg-east", company: "申通快递", product: "申通标准快递", type: "寄付", label: "申通标准快递｜东莞市 → 华东区" }
+    ];
 
     const chinaRegions = {
       "北京市": ["北京市"],
@@ -1197,7 +1278,46 @@
       "台湾省": ["台北市","新北市","桃园市","台中市","台南市","高雄市","基隆市","新竹市","嘉义市"]
     };
 
-    function initRegionPicker(isEdit) {
+    function initOriginPicker(initialProvince = "", initialCity = "") {
+      const provinceSelect = body.querySelector(".origin-province-select");
+      const citySelect = body.querySelector(".origin-city-select");
+      const field = body.querySelector(".origin-field");
+      if (!provinceSelect || !citySelect) return;
+
+      Object.keys(chinaRegions).forEach(province => {
+        const option = document.createElement("option");
+        option.value = province;
+        option.textContent = province;
+        provinceSelect.append(option);
+      });
+
+      function refreshCities(selectedCity = "") {
+        const cities = chinaRegions[provinceSelect.value] || [];
+        citySelect.innerHTML = '<option value="">请选择城市</option>';
+        cities.forEach(city => {
+          const option = document.createElement("option");
+          option.value = city;
+          option.textContent = city;
+          citySelect.append(option);
+        });
+        citySelect.disabled = !cities.length;
+        citySelect.value = cities.includes(selectedCity) ? selectedCity : "";
+      }
+
+      provinceSelect.value = initialProvince;
+      refreshCities(initialCity);
+      provinceSelect.addEventListener("change", () => {
+        refreshCities();
+        field?.classList.remove("invalid");
+        field?.querySelector(".field-error")?.classList.remove("show");
+      });
+      citySelect.addEventListener("change", () => {
+        field?.classList.remove("invalid");
+        field?.querySelector(".field-error")?.classList.remove("show");
+      });
+    }
+
+    function initRegionPicker(triggerData) {
       const picker = body.querySelector(".region-picker");
       if (!picker) return;
       const trigger = picker.querySelector(".region-trigger");
@@ -1284,6 +1404,9 @@
         selectAll.checked = selected.size === totalCities;
         selectAll.indeterminate = selected.size > 0 && selected.size < totalCities;
         summary.textContent = selected.size;
+        picker.dataset.selectedCount = String(selected.size);
+        picker.classList.remove("invalid");
+        picker.closest(".field")?.querySelector(".region-error")?.classList.remove("show");
         trigger.classList.toggle("has-value", selected.size > 0);
         triggerText.textContent = selected.size ? `已选择 ${selected.size} 个城市` : "请选择省/市，支持多选";
 
@@ -1304,8 +1427,15 @@
         });
       }
 
-      trigger.addEventListener("click", () => panel.classList.toggle("show"));
-      picker.querySelector(".region-confirm").addEventListener("click", () => panel.classList.remove("show"));
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.addEventListener("click", () => {
+        panel.classList.toggle("show");
+        trigger.setAttribute("aria-expanded", String(panel.classList.contains("show")));
+      });
+      picker.querySelector(".region-confirm").addEventListener("click", () => {
+        panel.classList.remove("show");
+        trigger.setAttribute("aria-expanded", "false");
+      });
       selectAll.addEventListener("change", () => {
         tree.querySelectorAll(".city-checkbox").forEach(cityCheck => {
           cityCheck.checked = selectAll.checked;
@@ -1329,8 +1459,13 @@
         });
       });
 
-      if (isEdit) {
-        ["上海市", "江苏省", "浙江省"].forEach(province => {
+      if (triggerData?.dataset.selectAll === "true") {
+        tree.querySelectorAll(".city-checkbox").forEach(cityCheck => {
+          cityCheck.checked = true;
+          selected.add(cityCheck.dataset.key);
+        });
+      } else if (triggerData?.dataset.regionProvinces) {
+        triggerData.dataset.regionProvinces.split(",").forEach(province => {
           tree.querySelectorAll(".province-row").forEach(row => {
             if (row.dataset.province !== province) return;
             row.querySelectorAll(".city-checkbox").forEach(cityCheck => {
@@ -1386,7 +1521,58 @@
       });
     }
 
-    function initBusinessPriceMode(isEdit) {
+    function initProductEditor(initialProducts = []) {
+      const list = body.querySelector(".product-list");
+      const addButton = body.querySelector(".add-product");
+      if (!list || !addButton) return;
+
+      function refreshIndexes() {
+        list.querySelectorAll(".product-item").forEach((item, index) => {
+          item.querySelector(".product-item-title").textContent = `服务产品 ${index + 1}`;
+        });
+      }
+
+      function addProduct(product = { name: "", code: "", category: "快递", status: "启用", types: ["寄付"] }) {
+        const item = document.createElement("div");
+        item.className = "product-item";
+        item.innerHTML = `
+          <div class="product-item-head">
+            <span class="product-item-title">服务产品</span>
+            <button type="button" class="link danger remove-product">删除产品</button>
+          </div>
+          <div class="product-item-grid">
+            <div class="field"><label class="required">产品名称</label><input class="required-input product-name-input" value="${product.name}" placeholder="例如：顺丰标快" /><div class="field-error">请输入产品名称</div></div>
+            <div class="field"><label class="required">产品编码</label><input class="required-input product-code-input" value="${product.code}" placeholder="例如：SF_STANDARD" /><div class="field-error">请输入产品编码</div></div>
+            <div class="field"><label class="required">产品分类</label><select class="product-category-select"><option>快递</option><option>快运</option><option>冷运</option><option>国际</option></select></div>
+            <div class="field"><label class="required">产品状态</label><select class="product-status-select"><option>启用</option><option>禁用</option></select></div>
+            <div class="field full product-type-field">
+              <label class="required">支持的服务方式</label>
+              <div class="checkbox-grid">
+                ${["寄付", "到付", "自提"].map(type => `<label class="check-card"><input type="checkbox" class="product-type-checkbox" value="${type}" ${product.types.includes(type) ? "checked" : ""} /> ${type}</label>`).join("")}
+              </div>
+            </div>
+          </div>
+        `;
+        item.querySelector(".product-category-select").value = product.category || "快递";
+        item.querySelector(".product-status-select").value = product.status || "启用";
+        item.querySelector(".remove-product").addEventListener("click", () => {
+          item.remove();
+          refreshIndexes();
+        });
+        item.querySelectorAll("input").forEach(input => input.addEventListener("input", () => {
+          list.classList.remove("invalid");
+          input.closest(".field")?.classList.remove("invalid");
+        }));
+        list.append(item);
+        list.classList.remove("invalid");
+        refreshIndexes();
+      }
+
+      (initialProducts.length ? initialProducts : [{ name: "", code: "", category: "快递", types: ["寄付"] }]).forEach(addProduct);
+      addButton.addEventListener("click", () => addProduct());
+    }
+
+    function initBusinessPriceMode(initialMode = "template") {
       const radios = [...body.querySelectorAll(".price-mode-radio")];
       const templateFields = body.querySelector(".template-price-fields");
       const manualFields = body.querySelector(".manual-price-fields");
@@ -1396,17 +1582,24 @@
         const selected = radios.find(radio => radio.checked)?.value || "template";
         templateFields.classList.toggle("hidden", selected !== "template");
         manualFields.classList.toggle("hidden", selected !== "manual");
+        if (selected !== "template") {
+          templateFields.classList.remove("invalid");
+          templateFields.querySelector(".field-error")?.classList.remove("show");
+        }
+        if (selected !== "manual") {
+          const regionField = manualFields.querySelector(".manual-region-field");
+          regionField?.classList.remove("invalid");
+          regionField?.querySelector(".field-error")?.classList.remove("show");
+        }
       }
 
-      if (isEdit) {
-        const manualRadio = radios.find(radio => radio.value === "manual");
-        manualRadio.checked = true;
-      }
+      const initialRadio = radios.find(radio => radio.value === initialMode);
+      if (initialRadio) initialRadio.checked = true;
       radios.forEach(radio => radio.addEventListener("change", updatePriceMode));
       updatePriceMode();
     }
 
-    function initExpressTypePricing(isEdit, initialType) {
+    function initExpressTypePricing(initialType) {
       const select = body.querySelector(".express-type-select");
       const priceSection = body.querySelector(".type-price-section");
       const noPriceSection = body.querySelector(".type-no-price-section");
@@ -1421,11 +1614,94 @@
         noPriceSection.classList.toggle("hidden", !expressType || needsPrice);
         if (typeLabel) typeLabel.textContent = expressType;
         error?.classList.remove("show");
+        select.closest(".field")?.classList.remove("invalid");
       }
 
-      if (isEdit) select.value = initialType || "寄付";
+      if (initialType) select.value = initialType;
       select.addEventListener("change", updateTypePricing);
       updateTypePricing();
+    }
+
+    function initCompanyProductTypeLinkage(initialProduct = "", initialType = "", initialRegion = "") {
+      const companySelect = body.querySelector(".company-select");
+      const productSelect = body.querySelector(".product-select");
+      const typeSelect = body.querySelector(".express-type-select");
+      const templateSelect = body.querySelector(".template-select");
+      const manualRegionSelect = body.querySelector(".manual-region-select");
+      if (!companySelect || !productSelect || !typeSelect) return;
+
+      function refreshTemplates(autoSelect = false) {
+        if (!templateSelect && !manualRegionSelect) return;
+        const matches = priceTemplateOptions.filter(option =>
+          option.company === companySelect.value &&
+          option.product === productSelect.value &&
+          option.type === typeSelect.value
+        );
+        [
+          [templateSelect, "请选择区域计价模板"],
+          [manualRegionSelect, "请选择适用配送区域"]
+        ].forEach(([select, placeholder]) => {
+          if (!select) return;
+          const current = select.value;
+          select.innerHTML = `<option value="">${placeholder}</option>`;
+          matches.forEach(template => {
+            const option = document.createElement("option");
+            option.value = template.value;
+            option.textContent = template.label;
+            select.append(option);
+          });
+          if (matches.some(option => option.value === initialRegion)) select.value = initialRegion;
+          else if (matches.some(option => option.value === current)) select.value = current;
+          else if (autoSelect && matches.length) select.value = matches[0].value;
+          select.closest(".field")?.classList.remove("invalid");
+          select.closest(".field")?.querySelector(".field-error")?.classList.remove("show");
+        });
+      }
+
+      function refreshTypes(preferredType = "", autoSelectTemplate = false) {
+        const product = (companyServiceProducts[companySelect.value] || []).find(item => item.name === productSelect.value);
+        const supportedTypes = product?.types || [];
+        typeSelect.innerHTML = '<option value="">请选择服务方式</option>';
+        supportedTypes.forEach(type => {
+          const option = document.createElement("option");
+          option.value = type;
+          option.textContent = type;
+          typeSelect.append(option);
+        });
+        typeSelect.disabled = !product;
+        typeSelect.value = supportedTypes.includes(preferredType) ? preferredType : "";
+        typeSelect.dispatchEvent(new Event("change"));
+        refreshTemplates(autoSelectTemplate);
+      }
+
+      function refreshProducts(preferredProduct = "", preferredType = "", autoSelectTemplate = false) {
+        const products = companyServiceProducts[companySelect.value] || [];
+        productSelect.innerHTML = '<option value="">请选择服务产品</option>';
+        products.forEach(product => {
+          const option = document.createElement("option");
+          option.value = product.name;
+          option.textContent = `${product.name}（${product.code}）`;
+          productSelect.append(option);
+        });
+        productSelect.disabled = !companySelect.value;
+        productSelect.value = products.some(product => product.name === preferredProduct) ? preferredProduct : "";
+        refreshTypes(preferredType, autoSelectTemplate);
+      }
+
+      refreshProducts(initialProduct, initialType, currentDrawerType.includes("edit"));
+      initialRegion = "";
+      companySelect.addEventListener("change", () => refreshProducts());
+      productSelect.addEventListener("change", () => {
+        refreshTypes();
+        const productName = productSelect.value;
+        if (productName) {
+          const frontName = body.querySelector(".front-name-input");
+          const backName = body.querySelector(".back-name-input");
+          if (frontName && !frontName.value) frontName.value = productName;
+          if (backName && !backName.value) backName.value = productName;
+        }
+      });
+      typeSelect.addEventListener("change", () => refreshTemplates());
     }
 
     const navItems = document.querySelectorAll(".nav-item");
@@ -1441,7 +1717,7 @@
     const body = document.getElementById("drawerBody");
     const title = document.getElementById("drawerTitle");
     const titles = {
-      base: "新建快递公司", "base-edit": "修改快递公司",
+      base: "新建快递公司及产品", "base-edit": "修改快递公司及产品",
       region: "新建区域模板", "region-edit": "修改区域模板",
       business: "新增业务线配置", "business-edit": "修改业务线配置"
     };
@@ -1449,51 +1725,126 @@
     function openDrawer(type, trigger) {
       const rootType = type.split("-")[0];
       const initialExpressType = trigger?.dataset.expressType || (type.includes("edit") ? "寄付" : "");
+      const initialProduct = trigger?.dataset.product || (type.includes("edit") ? "顺丰标快" : "");
       currentDrawerType = type;
       title.textContent = titles[type];
       body.innerHTML = document.getElementById("form-" + rootType).innerHTML;
       if (type.includes("edit")) {
-        const inputs = body.querySelectorAll("input");
         if (rootType === "base") {
-          body.querySelector('input[placeholder="请输入物流公司全称"]').value = "顺丰速运";
-          body.querySelector('input[placeholder="例如：SF"]').value = "SF";
-          body.querySelectorAll(".express-type-checkbox").forEach(checkbox => {
-            checkbox.checked = ["寄付", "到付", "自提"].includes(checkbox.value);
-          });
+          body.querySelector('input[placeholder="请输入物流公司全称"]').value = trigger?.dataset.company || "顺丰速运";
+          body.querySelector('input[placeholder="例如：SF"]').value = trigger?.dataset.abbr || "SF";
         }
         if (rootType === "region") {
-          body.querySelector('input[placeholder="例如：江浙沪核心区"]').value = "江浙沪核心区";
-          body.querySelector('input[placeholder="例如：1-2 天"]').value = "次日达";
+          body.querySelector('input[placeholder="例如：江浙沪核心区"]').value = trigger?.dataset.templateName || "江浙沪核心区";
+          body.querySelector(".company-select").value = trigger?.dataset.company || "顺丰速运";
+          body.querySelector('input[placeholder="例如：1-2 天"]').value = trigger?.dataset.sla || "次日达";
         }
-        if (rootType === "business") { inputs[0].value = "顺丰标快"; inputs[2].value = "顺丰速运"; }
+        if (rootType === "business") {
+          body.querySelector(".company-select").value = trigger?.dataset.company || "顺丰速运";
+          body.querySelector(".business-line-select").value = trigger?.dataset.businessLine || "商城订单";
+          body.querySelector(".front-name-input").value = trigger?.dataset.frontName || "顺丰标快";
+          body.querySelector(".back-name-input").value = trigger?.dataset.backName || "顺丰速运";
+        }
       }
-      if (rootType === "region") initRegionPicker(type.includes("edit"));
+      if (rootType === "base") {
+        initProductEditor(type.includes("edit") ? companyServiceProducts[trigger?.dataset.company || "顺丰速运"] : []);
+      }
+      if (rootType === "region") {
+        initOriginPicker(trigger?.dataset.originProvince || "", trigger?.dataset.originCity || "");
+        initRegionPicker(trigger);
+      }
       initRateEditors(body);
-      if (rootType === "business") initBusinessPriceMode(type.includes("edit"));
-      if (["region", "business"].includes(rootType)) initExpressTypePricing(type.includes("edit"), initialExpressType);
-      body.querySelectorAll(".express-type-checkbox").forEach(checkbox => checkbox.addEventListener("change", () => {
-        body.querySelector(".express-type-field .field-error")?.classList.remove("show");
-      }));
+      if (rootType === "business") initBusinessPriceMode(trigger?.dataset.priceMode || "template");
+      if (["region", "business"].includes(rootType)) {
+        initExpressTypePricing(initialExpressType);
+        initCompanyProductTypeLinkage(initialProduct, initialExpressType, trigger?.dataset.region || "");
+      }
+      body.querySelectorAll(".product-type-checkbox").forEach(checkbox => checkbox.addEventListener("change", () => body.querySelector(".product-list")?.classList.remove("invalid")));
+      body.querySelectorAll(".required-input").forEach(control => {
+        const clearError = () => {
+          const field = control.closest(".field");
+          field?.classList.remove("invalid");
+          field?.querySelector(".field-error")?.classList.remove("show");
+        };
+        control.addEventListener("input", clearError);
+        control.addEventListener("change", clearError);
+      });
+      body.querySelector(".template-select")?.addEventListener("change", event => {
+        const field = event.target.closest(".field");
+        field?.classList.remove("invalid");
+        field?.querySelector(".field-error")?.classList.remove("show");
+      });
       overlay.classList.add("show");
     }
     document.querySelectorAll(".open-drawer").forEach(btn => btn.addEventListener("click", () => openDrawer(btn.dataset.form, btn)));
     function closeDrawer() { overlay.classList.remove("show"); }
+    function showToast(message, duration = 1800) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+        toast.textContent = "保存成功，配置已更新";
+      }, duration);
+    }
+
+    function markField(field, invalid) {
+      field?.classList.toggle("invalid", invalid);
+      field?.querySelector(".field-error")?.classList.toggle("show", invalid);
+      return !invalid;
+    }
+
+    function validateDrawer() {
+      let valid = true;
+      body.querySelectorAll(".required-input").forEach(control => {
+        if (control.closest(".hidden") || control.disabled) return;
+        const value = String(control.value || "").trim();
+        valid = markField(control.closest(".field"), !value) && valid;
+      });
+
+      const rootType = currentDrawerType.split("-")[0];
+      if (rootType === "base") {
+        const productList = body.querySelector(".product-list");
+        const items = [...body.querySelectorAll(".product-item")];
+        const codes = items.map(item => item.querySelector(".product-code-input")?.value.trim().toUpperCase()).filter(Boolean);
+        const invalidProducts = !items.length || items.some(item => !item.querySelector(".product-type-checkbox:checked")) || new Set(codes).size !== codes.length;
+        productList?.classList.toggle("invalid", invalidProducts);
+        valid = !invalidProducts && valid;
+      }
+
+      if (["region", "business"].includes(rootType)) {
+        valid = markField(body.querySelector(".express-type-field"), !body.querySelector(".express-type-select")?.value) && valid;
+      }
+
+      if (rootType === "region") {
+        const originComplete = body.querySelector(".origin-province-select")?.value && body.querySelector(".origin-city-select")?.value;
+        valid = markField(body.querySelector(".origin-field"), !originComplete) && valid;
+        const picker = body.querySelector(".region-picker");
+        const regionInvalid = Number(picker?.dataset.selectedCount || 0) < 1;
+        picker?.classList.toggle("invalid", regionInvalid);
+        body.querySelector(".region-error")?.classList.toggle("show", regionInvalid);
+        valid = !regionInvalid && valid;
+      }
+
+      if (rootType === "business" && body.querySelector(".express-type-select")?.value === "寄付") {
+        const mode = body.querySelector(".price-mode-radio:checked")?.value;
+        if (mode === "template") {
+          const templateSelect = body.querySelector(".template-select");
+          valid = markField(templateSelect?.closest(".field"), !templateSelect?.value) && valid;
+        }
+      }
+
+      if (!valid) body.querySelector(".invalid input, .invalid select, .invalid button")?.focus();
+      return valid;
+    }
+
     document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
     document.getElementById("cancelDrawer").addEventListener("click", closeDrawer);
     overlay.addEventListener("click", e => { if (e.target === overlay) closeDrawer(); });
     document.getElementById("saveDrawer").addEventListener("click", () => {
-      if (currentDrawerType.startsWith("base") && !body.querySelector(".express-type-checkbox:checked")) {
-        body.querySelector(".express-type-field .field-error")?.classList.add("show");
-        return;
-      }
-      if (["region", "business"].includes(currentDrawerType.split("-")[0]) && !body.querySelector(".express-type-select")?.value) {
-        body.querySelector(".express-type-field .field-error")?.classList.add("show");
-        return;
-      }
+      if (!validateDrawer()) return;
       closeDrawer();
-      const toast = document.getElementById("toast");
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 1800);
+      showToast("保存成功，配置已更新");
     });
 
     const helpOverlay = document.getElementById("helpOverlay");
@@ -1507,14 +1858,72 @@
     });
     document.addEventListener("keydown", event => {
       if (event.key === "Escape" && helpOverlay.classList.contains("show")) closeHelp();
+      else if (event.key === "Escape" && overlay.classList.contains("show")) closeDrawer();
     });
 
-    document.querySelectorAll("tbody .link:not(.open-drawer)").forEach(btn => btn.addEventListener("click", () => {
-      const toast = document.getElementById("toast");
-      toast.textContent = btn.textContent + "操作已完成";
-      toast.classList.add("show");
-      setTimeout(() => { toast.classList.remove("show"); toast.textContent = "保存成功，配置已更新"; }, 1600);
+    function applyListFilter(page) {
+      const keyword = page.querySelector(".list-keyword")?.value.trim().toLowerCase() || "";
+      const filterMap = [
+        [".list-status", "status"],
+        [".list-company", "company"],
+        [".list-product", "product"],
+        [".list-express-type", "expressType"],
+        [".list-business-line", "businessLine"]
+      ];
+      let visibleCount = 0;
+      page.querySelectorAll("tbody tr").forEach(row => {
+        let matched = !keyword || row.textContent.toLowerCase().includes(keyword);
+        filterMap.forEach(([selector, dataKey]) => {
+          const select = page.querySelector(selector);
+          const selected = select?.value || "";
+          if (selected && !selected.startsWith("全部") && row.dataset[dataKey] !== selected) matched = false;
+        });
+        row.classList.toggle("filtered-out", !matched);
+        if (matched) visibleCount += 1;
+      });
+      const suffix = page.id === "page-region" ? "条区域模板" : page.id === "page-business" ? "条配置" : "条数据";
+      const note = page.querySelector(".toolbar-note");
+      if (note) note.textContent = `共 ${visibleCount} ${suffix}`;
+    }
+
+    document.querySelectorAll(".page").forEach(page => {
+      page.querySelector(".query-list")?.addEventListener("click", () => applyListFilter(page));
+      page.querySelector(".reset-list")?.addEventListener("click", () => {
+        page.querySelectorAll(".filters input").forEach(input => input.value = "");
+        page.querySelectorAll(".filters select").forEach(select => select.selectedIndex = 0);
+        applyListFilter(page);
+      });
+      page.querySelector(".list-keyword")?.addEventListener("keydown", event => {
+        if (event.key === "Enter") applyListFilter(page);
+      });
+    });
+
+    document.querySelectorAll(".status-action").forEach(btn => btn.addEventListener("click", () => {
+      const row = btn.closest("tr");
+      const downstreamCount = Number(row.dataset.downstreamCount || 0);
+      if (btn.closest("#page-base") && row.dataset.status === "启用" && downstreamCount > 0) {
+        showToast(`存在 ${downstreamCount} 条启用中的下游配置，请先停用区域及业务线配置`, 2600);
+        return;
+      }
+      const status = row.dataset.status === "启用" ? "禁用" : "启用";
+      row.dataset.status = status;
+      const tag = row.querySelector(".row-status");
+      tag.textContent = status;
+      tag.classList.toggle("tag-on", status === "启用");
+      tag.classList.toggle("tag-off", status === "禁用");
+      btn.textContent = status === "启用" ? "禁用" : "启用";
+      showToast(`${status}操作已完成`, 1600);
     }));
+
+    document.querySelectorAll(".delete-action").forEach(btn => btn.addEventListener("click", () => {
+      const row = btn.closest("tr");
+      const page = btn.closest(".page");
+      row.remove();
+      applyListFilter(page);
+      showToast("删除操作已完成（原型数据）", 1600);
+    }));
+
+    document.getElementById("messageButton").addEventListener("click", () => showToast("暂无新消息", 1400));
   </script>
 </body>
 </html>
