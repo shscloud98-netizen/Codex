@@ -669,7 +669,7 @@
       font-size: 12px;
       line-height: 1.5;
     }
-    .manual-region-field { margin-bottom: 12px; }
+    .manual-region-field, .non-price-region-field { margin-bottom: 12px; }
     .tier-list {
       margin-top: 12px;
       display: grid;
@@ -939,13 +939,15 @@
                 <button class="btn btn-sm query-list">查询</button>
                 <button class="btn btn-sm reset-list">重置</button>
               </div>
-              <div class="toolbar-note">共 4 条区域模板</div>
+              <div class="toolbar-note">共 6 条区域模板</div>
             </div>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>模板名称</th><th>快递公司</th><th>服务产品</th><th>服务方式</th><th>始发地</th><th>可送达区域</th><th>运输时效</th><th>基础计价模板</th><th>状态</th><th>更新时间</th><th>操作</th></tr></thead>
                 <tbody>
                   <tr data-company="顺丰速运" data-product="顺丰标快" data-express-type="寄付" data-status="启用"><td><b>标快·江浙沪核心区</b></td><td>顺丰速运</td><td>顺丰标快</td><td><span class="type-chip">寄付</span></td><td>广东省 / 深圳市</td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span></div></td><td>次日达</td><td class="rule-cell">首重 <b>1kg / ¥12.00</b><br><span class="muted">续重每 1kg 加 ¥2.00</span></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-18 09:30</td><td><button class="link open-drawer" data-form="region-edit" data-template-name="标快·江浙沪核心区" data-company="顺丰速运" data-product="顺丰标快" data-express-type="寄付" data-origin-province="广东省" data-origin-city="深圳市" data-sla="次日达" data-region-provinces="上海市,江苏省,浙江省">修改</button><button class="link status-action">禁用</button><button class="link danger delete-action">删除</button></td></tr>
+                  <tr data-company="顺丰速运" data-product="顺丰特快" data-express-type="到付" data-status="启用"><td><b>顺丰特快·全国到付区</b></td><td>顺丰速运</td><td>顺丰特快</td><td><span class="type-chip">到付</span></td><td>广东省 / 深圳市</td><td><div class="coverage"><span>全国</span></div></td><td>1-2 天</td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-23 09:30</td><td><button class="link open-drawer" data-form="region-edit" data-template-name="顺丰特快·全国到付区" data-company="顺丰速运" data-product="顺丰特快" data-express-type="到付" data-origin-province="广东省" data-origin-city="深圳市" data-sla="1-2 天" data-select-all="true">修改</button><button class="link status-action">禁用</button><button class="link danger delete-action">删除</button></td></tr>
+                  <tr data-company="顺丰速运" data-product="顺丰标快" data-express-type="自提" data-status="启用"><td><b>顺丰标快·全国自提区</b></td><td>顺丰速运</td><td>顺丰标快</td><td><span class="type-chip">自提</span></td><td>广东省 / 深圳市</td><td><div class="coverage"><span>全国自提网点</span></div></td><td>到站可提</td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-23 09:20</td><td><button class="link open-drawer" data-form="region-edit" data-template-name="顺丰标快·全国自提区" data-company="顺丰速运" data-product="顺丰标快" data-express-type="自提" data-origin-province="广东省" data-origin-city="深圳市" data-sla="到站可提" data-select-all="true">修改</button><button class="link status-action">禁用</button><button class="link danger delete-action">删除</button></td></tr>
                   <tr data-company="圆通速递" data-product="圆通标准快递" data-express-type="寄付" data-status="启用"><td><b>圆通标快·华东区</b></td><td>圆通速递</td><td>圆通标准快递</td><td><span class="type-chip">寄付</span></td><td>广东省 / 东莞市</td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span><span>安徽</span></div></td><td>1-2 天</td><td class="rule-cell">首重 <b>1kg / ¥8.00</b><br><span class="muted">续重每 1kg 加 ¥1.50</span></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-18 08:18</td><td><button class="link open-drawer" data-form="region-edit" data-template-name="圆通标快·华东区" data-company="圆通速递" data-product="圆通标准快递" data-express-type="寄付" data-origin-province="广东省" data-origin-city="东莞市" data-sla="1-2 天" data-region-provinces="上海市,江苏省,浙江省,安徽省">修改</button><button class="link status-action">禁用</button><button class="link danger delete-action">删除</button></td></tr>
                   <tr data-company="京东物流" data-product="京东标快" data-express-type="到付" data-status="启用"><td><b>京东标快·全国到付区</b></td><td>京东物流</td><td>京东标快</td><td><span class="type-chip">到付</span></td><td>广东省 / 深圳市</td><td><div class="coverage"><span>全国</span></div></td><td>2-3 天</td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on row-status">启用</span></td><td>2026-07-18 08:05</td><td><button class="link open-drawer" data-form="region-edit" data-template-name="京东标快·全国到付区" data-company="京东物流" data-product="京东标快" data-express-type="到付" data-origin-province="广东省" data-origin-city="深圳市" data-sla="2-3 天" data-select-all="true">修改</button><button class="link status-action">禁用</button><button class="link danger delete-action">删除</button></td></tr>
                   <tr data-company="中通快递" data-product="中通标准快递" data-express-type="自提" data-status="禁用"><td><b>中通标快·网点自提</b></td><td>中通快递</td><td>中通标准快递</td><td><span class="type-chip">自提</span></td><td>广东省 / 深圳市</td><td><div class="coverage"><span>上海</span><span>江苏</span><span>浙江</span></div></td><td>当日可提</td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-off row-status">禁用</span></td><td>2026-07-17 16:40</td><td><button class="link open-drawer" data-form="region-edit" data-template-name="中通标快·网点自提" data-company="中通快递" data-product="中通标准快递" data-express-type="自提" data-origin-province="广东省" data-origin-city="深圳市" data-sla="当日可提" data-region-provinces="上海市,江苏省,浙江省">修改</button><button class="link status-action">启用</button><button class="link danger delete-action">删除</button></td></tr>
@@ -978,11 +980,11 @@
             </div>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>快递公司</th><th>服务产品</th><th>调用业务线</th><th>服务方式</th><th>前端展示</th><th>后端展示</th><th>快递价格</th><th>状态</th><th>操作</th></tr></thead>
+                <thead><tr><th>快递公司</th><th>服务产品</th><th>调用业务线</th><th>服务方式</th><th>前端展示</th><th>后端展示</th><th>适用区域 / 快递价格</th><th>状态</th><th>操作</th></tr></thead>
                 <tbody>
                   <tr data-company="顺丰速运" data-product="顺丰标快" data-business-line="商城订单" data-express-type="寄付" data-status="启用"><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>顺丰标快</td><td>商城订单</td><td><span class="type-chip">寄付</span></td><td>顺丰标快 <span class="muted">#1</span></td><td>顺丰标快 <span class="muted">#10</span></td><td><span class="tag tag-warn">单独配置</span> <span class="muted">深圳市 → 江浙沪核心区</span> <span class="price">¥13.50 起</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="顺丰速运" data-product="顺丰标快" data-business-line="商城订单" data-express-type="寄付" data-front-name="顺丰标快" data-back-name="顺丰标快" data-price-mode="manual" data-region="sf-standard-sz-jzh">修改</button></td></tr>
-                  <tr data-company="顺丰速运" data-product="顺丰特快" data-business-line="商城订单" data-express-type="到付" data-status="启用"><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>顺丰特快</td><td>商城订单</td><td><span class="type-chip">到付</span></td><td>顺丰特快到付 <span class="muted">#2</span></td><td>顺丰特快 <span class="muted">#11</span></td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="顺丰速运" data-product="顺丰特快" data-business-line="商城订单" data-express-type="到付" data-front-name="顺丰特快到付" data-back-name="顺丰特快">修改</button></td></tr>
-                  <tr data-company="顺丰速运" data-product="顺丰标快" data-business-line="商城订单" data-express-type="自提" data-status="启用"><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>顺丰标快</td><td>商城订单</td><td><span class="type-chip">自提</span></td><td>网点自提 <span class="muted">#3</span></td><td>顺丰标快自提 <span class="muted">#12</span></td><td><span class="muted">无需配置价格</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="顺丰速运" data-product="顺丰标快" data-business-line="商城订单" data-express-type="自提" data-front-name="网点自提" data-back-name="顺丰标快自提">修改</button></td></tr>
+                  <tr data-company="顺丰速运" data-product="顺丰特快" data-business-line="商城订单" data-express-type="到付" data-status="启用"><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>顺丰特快</td><td>商城订单</td><td><span class="type-chip">到付</span></td><td>顺丰特快到付 <span class="muted">#2</span></td><td>顺丰特快 <span class="muted">#11</span></td><td><span class="muted">深圳市 → 全国到付区</span><br><span class="muted">无需配置价格</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="顺丰速运" data-product="顺丰特快" data-business-line="商城订单" data-express-type="到付" data-front-name="顺丰特快到付" data-back-name="顺丰特快" data-region="sf-express-sz-national-cod">修改</button></td></tr>
+                  <tr data-company="顺丰速运" data-product="顺丰标快" data-business-line="商城订单" data-express-type="自提" data-status="启用"><td><div class="company"><span class="company-logo blue">SF</span>顺丰速运</div></td><td>顺丰标快</td><td>商城订单</td><td><span class="type-chip">自提</span></td><td>网点自提 <span class="muted">#3</span></td><td>顺丰标快自提 <span class="muted">#12</span></td><td><span class="muted">深圳市 → 全国自提区</span><br><span class="muted">无需配置价格</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="顺丰速运" data-product="顺丰标快" data-business-line="商城订单" data-express-type="自提" data-front-name="网点自提" data-back-name="顺丰标快自提" data-region="sf-standard-sz-national-pickup">修改</button></td></tr>
                   <tr data-company="京东物流" data-product="京东标快" data-business-line="商城订单" data-express-type="寄付" data-status="启用"><td><div class="company"><span class="company-logo red">JD</span>京东物流</div></td><td>京东标快</td><td>商城订单</td><td><span class="type-chip">寄付</span></td><td>京东标快 <span class="muted">#4</span></td><td>京东标快 <span class="muted">#20</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">深圳市 → 全国标准区</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="京东物流" data-product="京东标快" data-business-line="商城订单" data-express-type="寄付" data-front-name="京东标快" data-back-name="京东标快" data-price-mode="template" data-region="jd-standard-sz-national">修改</button></td></tr>
                   <tr data-company="圆通速递" data-product="圆通标准快递" data-business-line="供应链调拨" data-express-type="寄付" data-status="启用"><td><div class="company"><span class="company-logo orange">YTO</span>圆通速递</div></td><td>圆通标准快递</td><td>供应链调拨</td><td><span class="type-chip">寄付</span></td><td>圆通标快 <span class="muted">#5</span></td><td>圆通标准快递 <span class="muted">#30</span></td><td><span class="tag tag-on">模板价格</span> <span class="muted">东莞市 → 华东区</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="圆通速递" data-product="圆通标准快递" data-business-line="供应链调拨" data-express-type="寄付" data-front-name="圆通标快" data-back-name="圆通标准快递" data-price-mode="template" data-region="yto-standard-dg-east">修改</button></td></tr>
                   <tr data-company="中通快递" data-product="中通标准快递" data-business-line="售后寄回" data-express-type="寄付" data-status="启用"><td><div class="company"><span class="company-logo green">ZTO</span>中通快递</div></td><td>中通标准快递</td><td>售后寄回</td><td><span class="type-chip">寄付</span></td><td>中通快递 <span class="muted">#6</span></td><td>中通标准快递 <span class="muted">#40</span></td><td><span class="tag tag-warn">单独配置</span> <span class="muted">广州市 → 华南核心区</span> <span class="price">¥7.00 起</span></td><td><span class="tag tag-on">启用</span></td><td><button class="link open-drawer" data-form="business-edit" data-company="中通快递" data-product="中通标准快递" data-business-line="售后寄回" data-express-type="寄付" data-front-name="中通快递" data-back-name="中通标准快递" data-price-mode="manual" data-region="zto-standard-gz-south">修改</button></td></tr>
@@ -1036,7 +1038,7 @@
           <div class="help-module">
             <div class="help-module-index">03</div>
             <div class="help-module-title">业务线单价配置</div>
-            <div class="help-module-text">同一业务线可分别配置不同服务产品和服务方式；寄付计价，到付与自提无需价格。</div>
+            <div class="help-module-text">同一业务线可分别配置不同服务产品和服务方式；三种方式均绑定适用区域，仅寄付计价。</div>
           </div>
         </div>
         <div class="help-rules">
@@ -1045,8 +1047,8 @@
             <li>“顺丰标快”等是顺丰速运的服务产品，不是子公司；公司与产品采用一对多关系。</li>
             <li>同一始发城市、快递公司、服务产品且同一服务方式的可送达区域不可重复覆盖。</li>
             <li>同一业务线下，不同服务产品及寄付、到付、自提可分别建立独立配置。</li>
-            <li>到付与自提不配置价格，只有寄付可选择模板价格或单独配置。</li>
-            <li>模板价格随区域计价模板更新；单独配置必须选择适用配送区域，仅覆盖所选区域的价格。</li>
+            <li>寄付、到付、自提均必须选择适用配送区域；到付与自提不配置价格，只有寄付可选择模板价格或单独配置。</li>
+            <li>模板价格随区域计价模板更新；单独配置仅覆盖所选区域的价格；到付、自提仅引用区域范围与时效。</li>
             <li>存在启用中的下游配置时，不允许直接禁用公司或产品；需先停用区域及业务线配置。</li>
             <li>当前为交互原型，示例数据不会持久化到服务器。</li>
           </ul>
@@ -1198,10 +1200,16 @@
       </div>
     </div>
     <div class="form-section type-no-price-section hidden">
-      <div class="section-title">快递价格</div>
+      <div class="section-title">配送范围与价格</div>
+      <div class="field full non-price-region-field">
+        <label class="required">适用配送区域</label>
+        <select class="non-price-region-select required-input"><option value="">请先选择公司、产品和服务方式</option></select>
+        <div class="field-help">仅展示当前公司、产品和服务方式下已启用的区域模板；到付/自提只引用范围与时效，不读取价格。 <button type="button" class="link go-region-config">去配置可送达区域</button></div>
+        <div class="field-error">请选择适用配送区域</div>
+      </div>
       <div class="no-price-card">
         <span class="no-price-icon">免</span>
-        <div><div class="no-price-title"><span class="selected-type-label"></span>无需配置价格</div><div class="muted">保存后仅生成当前快递类型的业务线展示配置。</div></div>
+        <div><div class="no-price-title"><span class="selected-type-label"></span>无需配置价格</div><div class="muted">保存后绑定所选配送区域并生成业务线展示配置，不生成价格规则。</div></div>
       </div>
     </div>
     <div class="form-section">
@@ -1232,10 +1240,13 @@
       "申通快递": [{ name: "申通标准快递", code: "STO_STANDARD", category: "快递", types: ["寄付", "自提"] }]
     };
 
-    const priceTemplateOptions = [
+    const regionTemplateOptions = [
       { value: "sf-standard-sz-jzh", company: "顺丰速运", product: "顺丰标快", type: "寄付", label: "顺丰标快｜深圳市 → 江浙沪核心区" },
       { value: "sf-express-sz-jzh", company: "顺丰速运", product: "顺丰特快", type: "寄付", label: "顺丰特快｜深圳市 → 江浙沪特快区" },
+      { value: "sf-express-sz-national-cod", company: "顺丰速运", product: "顺丰特快", type: "到付", label: "顺丰特快｜深圳市 → 全国到付区" },
+      { value: "sf-standard-sz-national-pickup", company: "顺丰速运", product: "顺丰标快", type: "自提", label: "顺丰标快｜深圳市 → 全国自提区" },
       { value: "jd-standard-sz-national", company: "京东物流", product: "京东标快", type: "寄付", label: "京东标快｜深圳市 → 全国标准区" },
+      { value: "jd-standard-sz-national-cod", company: "京东物流", product: "京东标快", type: "到付", label: "京东标快｜深圳市 → 全国到付区" },
       { value: "yto-standard-dg-east", company: "圆通速递", product: "圆通标准快递", type: "寄付", label: "圆通标准快递｜东莞市 → 华东区" },
       { value: "zto-standard-gz-south", company: "中通快递", product: "中通标准快递", type: "寄付", label: "中通标准快递｜广州市 → 华南核心区" },
       { value: "sto-standard-dg-east", company: "申通快递", product: "申通标准快递", type: "寄付", label: "申通标准快递｜东莞市 → 华东区" }
@@ -1628,22 +1639,25 @@
       const typeSelect = body.querySelector(".express-type-select");
       const templateSelect = body.querySelector(".template-select");
       const manualRegionSelect = body.querySelector(".manual-region-select");
+      const nonPriceRegionSelect = body.querySelector(".non-price-region-select");
       if (!companySelect || !productSelect || !typeSelect) return;
 
       function refreshTemplates(autoSelect = false) {
-        if (!templateSelect && !manualRegionSelect) return;
-        const matches = priceTemplateOptions.filter(option =>
+        if (!templateSelect && !manualRegionSelect && !nonPriceRegionSelect) return;
+        const matches = regionTemplateOptions.filter(option =>
           option.company === companySelect.value &&
           option.product === productSelect.value &&
           option.type === typeSelect.value
         );
         [
           [templateSelect, "请选择区域计价模板"],
-          [manualRegionSelect, "请选择适用配送区域"]
+          [manualRegionSelect, "请选择适用配送区域"],
+          [nonPriceRegionSelect, "请选择适用配送区域"]
         ].forEach(([select, placeholder]) => {
           if (!select) return;
           const current = select.value;
-          select.innerHTML = `<option value="">${placeholder}</option>`;
+          const emptyLabel = matches.length ? placeholder : "暂无可用区域，请先配置可送达区域";
+          select.innerHTML = `<option value="">${emptyLabel}</option>`;
           matches.forEach(template => {
             const option = document.createElement("option");
             option.value = template.value;
@@ -1729,6 +1743,10 @@
       currentDrawerType = type;
       title.textContent = titles[type];
       body.innerHTML = document.getElementById("form-" + rootType).innerHTML;
+      body.scrollTop = 0;
+      if (["region", "business"].includes(rootType) && trigger?.dataset.company) {
+        body.querySelector(".company-select").value = trigger.dataset.company;
+      }
       if (type.includes("edit")) {
         if (rootType === "base") {
           body.querySelector('input[placeholder="请输入物流公司全称"]').value = trigger?.dataset.company || "顺丰速运";
@@ -1773,6 +1791,14 @@
         const field = event.target.closest(".field");
         field?.classList.remove("invalid");
         field?.querySelector(".field-error")?.classList.remove("show");
+      });
+      body.querySelector(".go-region-config")?.addEventListener("click", () => {
+        const company = body.querySelector(".company-select")?.value || "";
+        const product = body.querySelector(".product-select")?.value || "";
+        const expressType = body.querySelector(".express-type-select")?.value || "";
+        closeDrawer();
+        document.querySelector('.nav-item[data-page="region"]')?.click();
+        openDrawer("region", { dataset: { company, product, expressType } });
       });
       overlay.classList.add("show");
     }
